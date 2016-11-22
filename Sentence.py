@@ -18,6 +18,8 @@ class Sentence:
         self.wordcount is updated
         '''
         wordlist = self.sen[:-1].split()
+        if "'" in wordlist:
+            wordlist.remove("'")
         self.wordcount = len(wordlist)
         return wordlist
 
