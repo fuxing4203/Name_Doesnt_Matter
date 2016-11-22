@@ -5,20 +5,33 @@ class PCA:
         #LoDM for list of document names
         #n is the number of words considered
         self.processedList = [[None] + LoDM]
-        self.wordlist = BasicStats.topN(BasicStats.createFreqMap(Document(LoDM[0]).wordlist), n)
+        fileA = Document(LoDM[0])
+        fileA.generateWhole()
+        wordlist = fileA.wordlist
+        worddict = BasicStats.topN(BasicStats.createFreqMap(wordlist), n)
+        self.wordlist = []
+        for i in worddict:
+            self.wordlist.append(i)
+        print(self.wordlist)
         self.dictList = []
         for item in LoDM:
-            self.dictList.append(BasicStats.topN(BasicStats.createFreqMap(Document(item).wordlist), len(BasicStats.createFreqMap(Document(item).wordlist))))
+            file = Document(item)
+            file.generateWhole()
+            wordlist = file.wordlist
+            freqMap = BasicStats.createFreqMap(wordlist)
+            self.dictList.append(BasicStats.topN(freqMap, len(freqMap)))
+        print('finished creating dict')
         self.wordCount = []
-        for item in dictList:
+        for item in self.dictList:
             count = 0
             for i in item:
                 count += item[i]
             self.wordCount.append(count)
+        print('finished counting')
         for w in self.wordlist:
             listofProb = []
-            for i in range(len(dictList)):
-                if w in dictList[i]:
+            for i in range(len(self.dictList)):
+                if w in self.dictList[i]:
                     listofProb.append(item[w]/self.wordCount[i])
                 else:
                     listofProb.append(0)
