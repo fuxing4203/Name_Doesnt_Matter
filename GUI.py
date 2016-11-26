@@ -4,7 +4,7 @@ class GUI:
     #charInfo is half way finished
     fileName = []
     filters = []
-    charInfo = []
+    charInfo = [] #[[position of filename, genre, year]]
     def __init__(self, root):
         self.root = root
         self.uploadB = Button(text = 'Upload', command = upLoadF)
@@ -24,6 +24,7 @@ class GUI:
         for label in root.grid_slaves():
             if int(label.grid_info()["row"]) >= row:
                 label.grid_forget()
+
 class textFiltersF(GUI):
     def __init__(self):
         super().__init__(root)
@@ -51,22 +52,86 @@ class predictF(GUI):
         labelframe.grid(columnspan = 100)
         left = Label(labelframe, text='Predictions')
         left.pack()
-        print(GUI.filters)
 
 class charInfoF(GUI):
     def __init__(self):
         super().__init__(root)
         self.forget()
-        labelframe = LabelFrame(self.root)
+        labelframe = LabelFrame(self.root, text = 'Characteristic Info')
         labelframe.grid(columnspan = 100)
         genreB = Button(text = 'Genre', command = self.genreF)
         yearB = Button(text = 'Year', command = self.yearF)
         genreB.grid(row = 1, column = 0)
         yearB.grid(row = 1, column = 1)
+        self.genreF()
     def genreF(self):
-        pass
+        self.forget(2)
+        genreFrame = LabelFrame(self.root, text = 'Genre')
+        genreFrame.grid(columnspan = 100)
+        vcmd = self.root.register(self.validate)
+        fileNameL = Label(genreFrame, text = 'Please enter the file name.')
+        fileName = Entry(genreFrame, validate="key", validatecommand=(vcmd, '%P'))
+        genreL = Label(genreFrame, text = 'Please enter the genre.')
+        genre = Entry(genreFrame, validate="key", validatecommand=(vcmd, '%P'))
+        upB = Button(genreFrame, text = 'Add', command = lambda: self.getResult(fileName, genre))
+        fileNameL.grid()
+        fileName.grid()
+        genreL.grid()
+        genre.grid()
+        upB.grid()
+
     def yearF(self):
-        pass
+        self.forget(2)
+        yearFrame = LabelFrame(self.root, text = 'Year')
+        yearFrame.grid(columnspan = 100)
+        vcmd = self.root.register(self.validate)
+        fileNameL = Label(yearFrame, text = 'Please enter the file name.')
+        fileName = Entry(yearFrame, validate="key", validatecommand=(vcmd, '%P'))
+        yearL = Label(yearFrame, text = 'Please enter the year.')
+        year = Entry(yearFrame, validate="key", validatecommand=(vcmd, '%P'))
+        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(fileName, year, 2))
+        fileNameL.grid()
+        fileName.grid()
+        yearL.grid()
+        year.grid()
+        upB.grid()
+
+    def getResult(self, fileName, info, infoType = 1):
+        if self.findFilenamePos(fileName):
+            pos = GUI.fileName.index(fileName.get())
+            updated = False
+            for item in GUI.charInfo:
+                if item[0] == pos:
+                    item[infoType] = info.get()
+                    updated = True
+                    break
+            if not updated:
+                if infoType == 1:
+                    GUI.charInfo.append([pos, info.get(), None])
+                else:
+                    GUI.charInfo.append([pos, None, info.get()])
+
+    def findFilenamePos(self, fileName):
+        try:
+            pos = GUI.fileName.index(fileName.get())
+            return True
+        except ValueError:
+            print('Invalid file name entered.')
+            return False
+
+    def validate(self, new_text):
+        '''
+        test the validity of the information inputed
+        '''
+        if not new_text: # the field is being cleared
+            self.entered_key = ''
+            return True
+
+        try:
+            self.entered_key = new_text
+            return True
+        except ValueError:
+            return False
 
 class statsF(GUI):
     def __init__(self):
@@ -113,7 +178,6 @@ class upLoadF(GUI):
 
         try:
             self.entered_filename = new_text
-            #print(self.entered_filename)
             return True
         except ValueError:
             return False
