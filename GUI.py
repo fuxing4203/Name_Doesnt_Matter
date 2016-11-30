@@ -3,8 +3,8 @@ class GUI:
     #for now text filters and upload are finished
     #charInfo is half way finished
     fileName = []
-    filters = []
-    charInfo = [] #[[position of filename, genre, year]]
+    filters = [] #[[filters]]
+    charInfo = [] #[[genre, year]]
     def __init__(self, root):
         self.root = root
         self.uploadB = Button(text = 'Upload', command = upLoadF)
@@ -31,18 +31,30 @@ class textFiltersF(GUI):
         self.forget()
         labelframe = LabelFrame(root, text = 'Text Filters, Click to Apply')
         labelframe.grid(columnspan = 100)
-        nws = Button(labelframe, text = 'Nomralize White Space', command = lambda: GUI.filters.append('NWS'))
-        nc = Button(labelframe, text = 'Normalize Cases', command = lambda: GUI.filters.append('NC'))
-        snc = Button(labelframe, text = 'Strip Null Characters', command = lambda: GUI.filters.append('SNC'))
-        sn = Button(labelframe, text = 'Strip Numbers', command = lambda: GUI.filters.append('SN'))
-        fw = Button(labelframe, text = 'Strip Null Characters', command = lambda: GUI.filters.append('SNC'))
-        fw = Button(labelframe, text = 'Filter Words', command = lambda: GUI.filters.append('FW'))
+        variables = []
+        for i in range(len(GUI.fileName)):
+            var = IntVar()
+            Checkbutton(labelframe, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
+            variables.append(var)
+        nws = Button(labelframe, text = 'Nomralize White Space', command = lambda: self.appendFilters(variables, 'NWS'))
+        nc = Button(labelframe, text = 'Normalize Cases', command = lambda: self.appendFilters(variables, 'NC'))
+        snc = Button(labelframe, text = 'Strip Null Characters', command = lambda: self.appendFilters(variables, 'SNC'))
+        sn = Button(labelframe, text = 'Strip Numbers', command = lambda: self.appendFilters(variables, 'SN'))
+        fw = Button(labelframe, text = 'Strip Null Characters', command = lambda: self.appendFilters(variables, 'SNC'))
+        fw = Button(labelframe, text = 'Filter Words', command = lambda: self.appendFilters(variables, 'FW'))
         nws.grid(sticky = 'W')
         nc.grid(sticky = 'W')
         snc.grid(sticky = 'W')
         sn.grid(sticky = 'W')
         fw.grid(sticky = 'W')
 
+    def appendFilters(self, variables, keyword):
+        if GUI.filters == []:
+            for i in range(len(GUI.fileName)):
+                GUI.filters.append([])
+        for i in range(len(variables)):
+            if variables[i].get() == 1:
+                GUI.filters[i].append(keyword)
 
 class predictF(GUI):
     def __init__(self):
@@ -52,6 +64,7 @@ class predictF(GUI):
         labelframe.grid(columnspan = 100)
         left = Label(labelframe, text='Predictions')
         left.pack()
+        print(GUI.filters)
 
 class charInfoF(GUI):
     def __init__(self):
@@ -64,18 +77,20 @@ class charInfoF(GUI):
         genreB.grid(row = 1, column = 0)
         yearB.grid(row = 1, column = 1)
         self.genreF()
+
     def genreF(self):
         self.forget(2)
         genreFrame = LabelFrame(self.root, text = 'Genre')
         genreFrame.grid(columnspan = 100)
         vcmd = self.root.register(self.validate)
-        fileNameL = Label(genreFrame, text = 'Please enter the file name.')
-        fileName = Entry(genreFrame, validate="key", validatecommand=(vcmd, '%P'))
+        variables = []
+        for i in range(len(GUI.fileName)):
+            var = IntVar()
+            Checkbutton(genreFrame, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
+            variables.append(var)
         genreL = Label(genreFrame, text = 'Please enter the genre.')
         genre = Entry(genreFrame, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(genreFrame, text = 'Add', command = lambda: self.getResult(fileName, genre))
-        fileNameL.grid()
-        fileName.grid()
+        upB = Button(genreFrame, text = 'Add', command = lambda: self.getResult(variables, genre))
         genreL.grid()
         genre.grid()
         upB.grid()
@@ -85,39 +100,25 @@ class charInfoF(GUI):
         yearFrame = LabelFrame(self.root, text = 'Year')
         yearFrame.grid(columnspan = 100)
         vcmd = self.root.register(self.validate)
-        fileNameL = Label(yearFrame, text = 'Please enter the file name.')
-        fileName = Entry(yearFrame, validate="key", validatecommand=(vcmd, '%P'))
+        variables = []
+        for i in range(len(GUI.fileName)):
+            var = IntVar()
+            Checkbutton(yearFrame, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
+            variables.append(var)
         yearL = Label(yearFrame, text = 'Please enter the year.')
         year = Entry(yearFrame, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(fileName, year, 2))
-        fileNameL.grid()
-        fileName.grid()
+        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(variables, year, 2))
         yearL.grid()
         year.grid()
         upB.grid()
 
-    def getResult(self, fileName, info, infoType = 1):
-        if self.findFilenamePos(fileName):
-            pos = GUI.fileName.index(fileName.get())
-            updated = False
-            for item in GUI.charInfo:
-                if item[0] == pos:
-                    item[infoType] = info.get()
-                    updated = True
-                    break
-            if not updated:
-                if infoType == 1:
-                    GUI.charInfo.append([pos, info.get(), None])
-                else:
-                    GUI.charInfo.append([pos, None, info.get()])
-
-    def findFilenamePos(self, fileName):
-        try:
-            pos = GUI.fileName.index(fileName.get())
-            return True
-        except ValueError:
-            print('Invalid file name entered.')
-            return False
+    def getResult(self, variables, info, infoType = 1):
+        if GUI.charInfo == []:
+            for i in range(len(GUI.fileName)):
+                GUI.charInfo.append([None, None])
+        for i in range(len(variables)):
+            if variables[i].get() == 1:
+                GUI.charInfo[i][infoType] = info.get()
 
     def validate(self, new_text):
         '''
