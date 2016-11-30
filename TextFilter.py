@@ -45,35 +45,6 @@ class TextFilter:
                     word += self.wordlist[i][ch]
             self.wordlist[i] = word
 
-    def apply(stringList):
-        '''
-        apply methods and piece back words into a text
-        return the text
-        '''
-        #apply the methods
-        while len(stringList) > 0:
-            if stringList[0] == 'NWS':
-                #normalize whilespace
-                nSpace(self)
-            elif stringList[0] == 'NC':
-                #normalize case
-                nCase(self)
-            elif stringList[0] == 'SNC':
-                #strip null characters
-                sNullChar(self)
-            elif stringList[0] == 'SN':
-                #strip number
-                sNumber(self)
-            elif stringList[0] == 'FW':
-                #filter words
-                nWords(self)
-            else:
-                return None
-            stringList = stringList[1:]
-        for i in range(len(self.wordlist)):
-            self.text += self.wordlist[i] + ' '
-        return self.text
-
     def nWords(self):
         '''
         remove all words provided in the file with given fileName
@@ -89,3 +60,33 @@ class TextFilter:
         for i in range(len(self.wordlist)):
             if self.wordlist[i] in words:
                 self.pop(i)
+
+    def apply(stringList):
+        '''
+        apply methods and piece back words into a text
+        return the text
+        '''
+        #apply the methods
+        for i in range(len(stringList)):
+            if stringList[i] == 'NWS':
+                #normalize whilespace
+                nSpace(self)
+            if stringList[i] == 'NC':
+                #normalize case
+                nCase(self)
+            if stringList[i] == 'SNC':
+                #strip null characters
+                sNullChar(self)
+            if stringList[i] == 'SN':
+                #strip number
+                sNumber(self)
+            if stringList[i] == 'FW':
+                #filter words
+                nWords(self)
+        for i in range(len(self.wordlist)):
+            self.text += self.wordlist[i] + ' '
+        filename = D.filename[:-4] + 'M' + '.txt'
+        file = open(filename, 'w')
+        file.write(self.text)
+        file.close()
+
