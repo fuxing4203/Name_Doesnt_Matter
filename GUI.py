@@ -155,18 +155,29 @@ class upLoadF(GUI):
         vcmd = self.root.register(self.validate)
         fileName = Entry(labelframe, validate="key", validatecommand=(vcmd, '%P'))
         upB = Button(labelframe, text = 'Upload', command = lambda: self.getResult(fileName))
+        removeB = Button(labelframe, text = 'Remove', command = lambda: self.removeResult(fileName))
         fileNameL.grid()
         fileName.grid(columnspan = 10)
         upB.grid()
+        removeB.grid()
         self.printFileNames()
 
     def printFileNames(self):
         self.forget(2)
+        Label(self.root, text = 'Uploaded Files').grid(columnspan = 3)
         for item in GUI.fileName:
-            Label(root, text = item).grid()
+            Label(self.root, text = item).grid()
 
     def getResult(self, fileName):
         GUI.fileName.append(fileName.get())
+        self.printFileNames()
+    def removeResult(self, fileName):
+        index = GUI.fileName.index(fileName.get())
+        GUI.fileName.pop(index)
+        if GUI.filters != []:
+            GUI.filters.pop(index)
+        if GUI.charInfo != []:
+            GUI.charInfo.pop(index)
         self.printFileNames()
 
     def validate(self, new_text):
@@ -176,7 +187,6 @@ class upLoadF(GUI):
         if not new_text: # the field is being cleared
             self.entered_filename = ''
             return True
-
         try:
             self.entered_filename = new_text
             return True
