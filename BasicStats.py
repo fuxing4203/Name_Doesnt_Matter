@@ -3,8 +3,7 @@ from Sentence import Sentence
 from DocumentStream import DocumentStream
 from copy import deepcopy
 from sllist import *
-
-
+from Heap import *
 
 
 class BasicStats:
@@ -182,22 +181,20 @@ class BasicStats:
         minlists = [0]
         for i in adict:
             if len(maxlistn) < n + 1:
-                HheapAdd(maxlistn,maxlists, adict[i], i)
-                LheapAdd(minlistn, minlists, adict[i], i)
-                
-                
+                Heapsort.HheapAdd(maxlistn,maxlists, adict[i], i)
+                Heapsort.LheapAdd(minlistn, minlists, adict[i], i)
             else:
                 if adict[i] > maxlistn[1]:
                     maxlistn[1] = adict[i]
                     maxlists[1] = i
-                    lfixdown(maxlistn, maxlists, 1)
+                    Heapsort.lfixdown(maxlistn, maxlists, 1)
                 elif adict[i] < minlistn[1]:
                     minlistn[1] = adict[i]
                     minlists[1] = i
-                    hfixdown(minlistn, minlists, 1)
+                    Heapsort.hfixdown(minlistn, minlists, 1)
         return [maxlistn, maxlists,minlistn, minlists]
 
-
+'''
 def parentindexforbaseone(heap, rootindex):
     #for base one
     return rootindex //2
@@ -321,3 +318,4 @@ def LheapAdd(heapn,heaps, root, word):
     heapn += [root]
     heaps += [word]
     LfixUp(heapn,heaps,len(heapn)-1)
+'''
