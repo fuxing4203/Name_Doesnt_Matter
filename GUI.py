@@ -36,6 +36,9 @@ class textFiltersF(GUI):
             var = IntVar()
             Checkbutton(labelframe, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
             variables.append(var)
+        if GUI.fileName == []:
+            welcome = Label(labelframe, text = 'Welcome!\nPlease press upload button to upload the file.')
+            welcome.grid(columnspan = 5)
         nws = Button(labelframe, text = 'Nomralize White Space', command = lambda: self.appendFilters(variables, 'NWS'))
         nc = Button(labelframe, text = 'Normalize Cases', command = lambda: self.appendFilters(variables, 'NC'))
         snc = Button(labelframe, text = 'Strip Null Characters', command = lambda: self.appendFilters(variables, 'SNC'))
@@ -88,6 +91,9 @@ class charInfoF(GUI):
             var = IntVar()
             Checkbutton(genreFrame, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
             variables.append(var)
+        if GUI.fileName == []:
+            welcome = Label(genreFrame, text = 'Welcome!\nPlease press upload button to upload the file.')
+            welcome.grid(columnspan = 5)
         genreL = Label(genreFrame, text = 'Please enter the genre.')
         genre = Entry(genreFrame, validate="key", validatecommand=(vcmd, '%P'))
         upB = Button(genreFrame, text = 'Add', command = lambda: self.getResult(variables, genre))
@@ -105,6 +111,9 @@ class charInfoF(GUI):
             var = IntVar()
             Checkbutton(yearFrame, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
             variables.append(var)
+        if GUI.fileName == []:
+            welcome = Label(yearFrame, text = 'Welcome!\nPlease press upload button to upload the file.')
+            welcome.grid(columnspan = 5)
         yearL = Label(yearFrame, text = 'Please enter the year.')
         year = Entry(yearFrame, validate="key", validatecommand=(vcmd, '%P'))
         upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(variables, year, 2))
