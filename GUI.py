@@ -1,4 +1,14 @@
 from tkinter import *
+from os import *
+from os.path import *
+from Document import *
+from DocumentStream import *
+from Sentence import *
+from DecisionTree import *
+from BasicStats import *
+from TextFilter import *
+
+
 class GUI:
     #for now text filters and upload are finished
     #charInfo is half way finished
@@ -29,9 +39,21 @@ class textFiltersF(GUI):
     def __init__(self):
         super().__init__(root)
         self.forget()
-        labelframe = LabelFrame(root, text = 'Text Filters, Click to Apply')
-        labelframe.grid(columnspan = 100)
+        labelframe2 = LabelFrame(root, text = 'Files, Check to apply')
+        labelframe2.grid()
+ #       labelframe2.grid(row = 2, column = 0, columnspan = 1, sticky = W)
+        labelframe = LabelFrame(root, text = 'Text Filters, Check to Apply')
+        labelframe.grid(row = 2, column = 2, columnspan = 2 ,sticky = N)
+        labelframe1 = LabelFrame(root, text = 'State')
+        labelframe1.grid(row = 2,column = 4, columnspan = 1, sticky = W+E+N+S)
         variables = []
+        self.sti_text = StringVar()
+        self.sti= "Haven't applied anything"
+        
+        self.sti_text.set(self.sti)
+        
+        stil = Label(labelframe1, textvariable = self.sti_text)
+        stil.grid(columnspan= 2 , sticky = W+E+N+S)
         for i in range(len(GUI.fileName)):
             var = IntVar()
             Checkbutton(labelframe, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
@@ -39,18 +61,53 @@ class textFiltersF(GUI):
         if GUI.fileName == []:
             welcome = Label(labelframe, text = 'Welcome!\nPlease press upload button to upload the file.')
             welcome.grid(columnspan = 5)
+        self.varnws = IntVar()
+        self.varnc = IntVar()
+        self.varsnc = IntVar()
+        self.varsn = IntVar()
+        self.varfw = IntVar()
+        self.filters = ['NWS','NC','SNC','SN','FW']
+        nws = Checkbutton(labelframe, text = 'Nomralize White Space',variable = self.varnws, onvalue = 1, offvalue = 0)
+        nc = Checkbutton(labelframe, text = 'Normalize Cases',variable = self.varnc, onvalue = 1, offvalue = 0)
+        snc = Checkbutton(labelframe, text = 'Strip Null Characters',variable = self.varsnc, onvalue = 1, offvalue = 0)
+        sn = Checkbutton(labelframe, text = 'Strip Numbers',variable = self.varsn, onvalue = 1, offvalue = 0)
+        fw = Checkbutton(labelframe, text = 'Filter Words',variable = self.varfw, onvalue = 1, offvalue = 0)
+        ap = Button(labelframe, text = 'Apply filters',command = lambda: self.applyfilters(variables,[self.varnws, self.varnc, self.varsnc, self.varsn, self.varfw]))
+        
+        '''
         nws = Button(labelframe, text = 'Nomralize White Space', command = lambda: self.appendFilters(variables, 'NWS'))
         nc = Button(labelframe, text = 'Normalize Cases', command = lambda: self.appendFilters(variables, 'NC'))
         snc = Button(labelframe, text = 'Strip Null Characters', command = lambda: self.appendFilters(variables, 'SNC'))
         sn = Button(labelframe, text = 'Strip Numbers', command = lambda: self.appendFilters(variables, 'SN'))
         fw = Button(labelframe, text = 'Strip Null Characters', command = lambda: self.appendFilters(variables, 'SNC'))
         fw = Button(labelframe, text = 'Filter Words', command = lambda: self.appendFilters(variables, 'FW'))
+        ap = Button(labelframe, text = 'Apply filters', command = lambda: self.applyfilters(variables))
+        '''                
+        
         nws.grid(sticky = 'W')
         nc.grid(sticky = 'W')
         snc.grid(sticky = 'W')
         sn.grid(sticky = 'W')
         fw.grid(sticky = 'W')
+        ap.grid(sticky = 'E')
 
+    def applyfilters(self, variables, filterscs):
+        empty = True
+        for i in range(len(variables)):
+            if variables[i].get() == 1:
+                print('did3')
+                do = Document(GUI.fileName[i])
+                print(len(do))
+                dofil = TextFilter(do)
+                dofil.apply([self.filters[j] for j in range(len(filterscs)) if filterscs[j].get() == 1])
+                empty = False
+        if empty== True:
+            self.sti= 'Nothing applied'
+        else:
+            self.sti= 'Successfully applied'
+        self.sti_text.set(self.sti)
+    
+    '''
     def appendFilters(self, variables, keyword):
         if GUI.filters == []:
             for i in range(len(GUI.fileName)):
@@ -58,7 +115,29 @@ class textFiltersF(GUI):
         for i in range(len(variables)):
             if variables[i].get() == 1:
                 GUI.filters[i].append(keyword)
+    '''
+    '''
+    def applyfilters(self, variables):
+        print('did')
+        empty = True
+        for i in range(len(variables)):
+            if variables[i].get() == 1:
+                do = Document(GUI.fileName[i])
+                dofil = TextFilter(do)
+                dofil.apply(GUI.filters[i])
+                empty = False
+        if empty:
+            self.sti= 'Nothing applied'
+        else:
+            self.sti= 'Successfully applied'
+        self.sti_text.set(self.sti)
+    '''
+            
+    
+ 
 
+                
+    
 class predictF(GUI):
     def __init__(self):
         super().__init__(root)
@@ -159,23 +238,25 @@ class upLoadF(GUI):
         super().__init__(root)
         self.forget()
         labelframe = LabelFrame(self.root)
-        labelframe.grid(columnspan = 100)
+        labelframe.grid(rowspan = 5, column = 0, columnspan = 2, sticky = N)
         fileNameL = Label(labelframe, text = 'Please enter the file name.')
         vcmd = self.root.register(self.validate)
         fileName = Entry(labelframe, validate="key", validatecommand=(vcmd, '%P'))
         upB = Button(labelframe, text = 'Upload', command = lambda: self.getResult(fileName))
         removeB = Button(labelframe, text = 'Remove', command = lambda: self.removeResult(fileName))
-        fileNameL.grid()
-        fileName.grid(columnspan = 10)
-        upB.grid()
-        removeB.grid()
+        fileNameL.grid(row=1,column = 0, columnspan = 2)
+        fileName.grid(row=2,column = 0 ,columnspan = 2)
+        upB.grid(row = 3,sticky = W+E)
+        removeB.grid(row = 4, sticky = W+E)
         self.printFileNames()
 
     def printFileNames(self):
         self.forget(2)
-        Label(self.root, text = 'Uploaded Files').grid(columnspan = 3)
+        Label(self.root, text = 'Uploaded Files').grid(row = 1, column = 2, columnspan = 3, sticky = N)
+        rown = 2
         for item in GUI.fileName:
-            Label(self.root, text = item).grid()
+            Label(self.root, text = item).grid(row= rown, column = 2, columnspan = 3, sticky = N)
+            rown+= 1
 
     def getResult(self, fileName):
         GUI.fileName.append(fileName.get())
