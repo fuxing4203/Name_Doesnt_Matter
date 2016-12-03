@@ -7,6 +7,7 @@ class DocumentStream:
         '''
         self.text = ''
         self.slist = []
+        self.firstline = ''
 
     def readfile(self, filename):
         '''
@@ -15,7 +16,7 @@ class DocumentStream:
         '''
         result = DocumentStreamError.existFileName(filename)
         if result == "Pass":
-            file = open(filename,'r')
+            file = open(filename,'rt', encoding = 'UTF-8')
             self.firstline = file.readline()
             self.text = file.read()
             file.close()
@@ -73,11 +74,13 @@ class DocumentStream:
         input the filename 
         out put a list [Bookname, authorname]
         '''
-        DocumentStream.readfile(self,filename)
         info = self.firstline
         info.strip('The Project Gutenberg EBook of ')
         firstbooksecondauthor = info.split(',')
         return firstbooksecondauthor
 
+    def getauthor(self):
+        return self.parsetitleauthor(filename)[1][4:-1]
+
     
-        
+    
