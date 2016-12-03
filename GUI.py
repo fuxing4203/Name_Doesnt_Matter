@@ -10,9 +10,8 @@ from TextFilter import *
 
 
 class GUI:
-    #for now text filters and upload are finished
-    #charInfo is half way finished
     fileName = []
+    fileObj = []
     filters = [] #[[filters]]
     charInfo = [] #[[genre, year, topics]]
     def __init__(self, root):
@@ -49,6 +48,8 @@ class textFiltersF(GUI):
         self.stateFrame = LabelFrame(root, text = 'State')
         self.state()
         self.stateFrame.grid(row = 2,column = 4, columnspan = 1, sticky = W+E+N+S)
+        for fileN in GUI.fileName:
+            GUI.fileObj.append(Document(fileN))
 
     def filters(self):
         self.varnws = IntVar()
@@ -90,13 +91,10 @@ class textFiltersF(GUI):
         empty = True
         for i in range(len(variables)):
             if variables[i].get() == 1:
-                print('did3')
-                do = Document(GUI.fileName[i])
-                print(len(do))
-                dofil = TextFilter(do)
+                dofil = TextFilter(GUI.fileObj[i])
                 dofil.apply([self.filters[j] for j in range(len(filterscs)) if filterscs[j].get() == 1])
                 empty = False
-        if empty== True:
+        if empty == True:
             self.sti= 'Nothing applied'
         else:
             self.sti= 'Successfully applied'
@@ -161,7 +159,7 @@ class charInfoF(GUI):
             welcome.grid(columnspan = 5)
         yearL = Label(yearFrame, text = 'Please enter the year.')
         year = Entry(yearFrame, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(variables, year, 3))
+        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(variables, year, 1))
         yearL.grid()
         year.grid()
         upB.grid()
@@ -190,7 +188,6 @@ class charInfoF(GUI):
         if GUI.charInfo == []:
             for i in range(len(GUI.fileName)):
                 GUI.charInfo.append([None, None, None])
-        print(len(variables))
         for i in range(len(variables)):
             if variables[i].get() == 1:
                 GUI.charInfo[i][infoType] = info.get()
@@ -214,11 +211,29 @@ class statsF(GUI):
     def __init__(self):
         super().__init__(root)
         self.forget()
-        labelframe = LabelFrame(self.root)
-        labelframe.grid(columnspan = 100)
-        left = Label(labelframe, text='Statistics')
-        left.pack()
-
+        topNB = Button(text = 'TopN', command = self.topNF)
+        printStatsB = Button(text = 'Display Statistics', command = self.printStatsF)
+        printStatsB.grid(row = 1, column = 0)
+        topNB.grid(row = 1, column = 1)
+        self.printStatsF()
+    def printStatsF(self):
+        self.forget(2)
+        statsframe = LabelFrame(self.root)
+        statsframe.grid(columnspan = 5, sticky = E+W+S+N)
+        attr = ['genre', 'year', 'topics', 'author', 'word count', 'line count', 'char count']
+        Label(statsframe, text = ' ').grid(row = 2, column = 0)
+        for i in range(len(GUI.fileName)):
+            Label(statsframe, text = GUI.fileName[i]).grid(row = 2, column = i + 1)
+        for i in range(len(attr)):
+            Label(statsframe, text = attr[i]).grid(row = i + 3, column = 0)
+            if i >= 0  and i <= 2:
+                for m in range(len(GUI.fileObj)):
+                    Label(statsframe, text = GUI.charInfo[m][i]).grid(row = i + 3, column = m + 1)
+    def topNF(self):
+        self.forget(2)
+        topNframe = LabelFrame(self.root, text = 'TopN')
+        topNframe.grid(columnspan = 5, sticky = E+W+S+N)
+        pass
 
 class upLoadF(GUI):
     def __init__(self):
@@ -248,6 +263,7 @@ class upLoadF(GUI):
     def getResult(self, fileName):
         GUI.fileName.append(fileName.get())
         self.printFileNames()
+
     def removeResult(self, fileName):
         index = GUI.fileName.index(fileName.get())
         GUI.fileName.pop(index)
@@ -255,6 +271,8 @@ class upLoadF(GUI):
             GUI.filters.pop(index)
         if GUI.charInfo != []:
             GUI.charInfo.pop(index)
+        if GUI.fileObj != []:
+            GUI.fileObj.pop(index)
         self.printFileNames()
 
     def validate(self, new_text):
