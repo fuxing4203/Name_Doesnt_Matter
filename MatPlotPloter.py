@@ -28,3 +28,12 @@ class MatPlotPloter:
         self.figure += 1
         plt.barh(y, x)
         plt.show()
+
+    def barGraphfortop(self, x, y, book = 'None Given'):
+        
+        y_pos = np.arange(len(x))
+        plt.barh(y_pos, y, height = 0.5-(4/(len(y_pos)+2)),align='center', alpha=0.2)
+        plt.yticks(y_pos, x)
+        plt.xlabel('Frequency')
+        plt.title(book.upper()+ " - most frequent used words")
+        plt.show()
