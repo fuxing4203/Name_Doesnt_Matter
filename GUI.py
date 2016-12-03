@@ -14,7 +14,7 @@ class GUI:
     #charInfo is half way finished
     fileName = []
     filters = [] #[[filters]]
-    charInfo = [] #[[genre, year]]
+    charInfo = [] #[[genre, year, topics]]
     def __init__(self, root):
         self.root = root
         self.uploadB = Button(text = 'Upload', command = upLoadF)
@@ -120,8 +120,10 @@ class charInfoF(GUI):
         labelframe.grid(columnspan = 100)
         genreB = Button(text = 'Genre', command = self.genreF)
         yearB = Button(text = 'Year', command = self.yearF)
+        topicsB = Button(text = 'Topics', command = self.topicsF)
         genreB.grid(row = 1, column = 0)
         yearB.grid(row = 1, column = 1)
+        topicsB.grid(row = 1, column = 2)
         self.genreF()
 
     def genreF(self):
@@ -159,18 +161,40 @@ class charInfoF(GUI):
             welcome.grid(columnspan = 5)
         yearL = Label(yearFrame, text = 'Please enter the year.')
         year = Entry(yearFrame, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(variables, year, 2))
+        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(variables, year, 3))
         yearL.grid()
         year.grid()
         upB.grid()
 
-    def getResult(self, variables, info, infoType = 1):
+    def topicsF(self):
+        self.forget(2)
+        topicsFrame = LabelFrame(self.root, text = 'Topics')
+        topicsFrame.grid(columnspan = 100)
+        vcmd = self.root.register(self.validate)
+        variables = []
+        for i in range(len(GUI.fileName)):
+            var = IntVar()
+            Checkbutton(topicsFrame, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
+            variables.append(var)
+        if GUI.fileName == []:
+            welcome = Label(topicsFrame, text = 'Welcome!\nPlease press upload button to upload the file.')
+            welcome.grid(columnspan = 5)
+        topicsL = Label(topicsFrame, text = 'Please enter the year.')
+        topics = Entry(topicsFrame, validate="key", validatecommand=(vcmd, '%P'))
+        upB = Button(topicsFrame, text = 'Add', command = lambda: self.getResult(variables, topics, 2))
+        topicsL.grid()
+        topics.grid()
+        upB.grid()
+
+    def getResult(self, variables, info, infoType = 0):
         if GUI.charInfo == []:
             for i in range(len(GUI.fileName)):
-                GUI.charInfo.append([None, None])
+                GUI.charInfo.append([None, None, None])
+        print(len(variables))
         for i in range(len(variables)):
             if variables[i].get() == 1:
                 GUI.charInfo[i][infoType] = info.get()
+        print(GUI.charInfo)
 
     def validate(self, new_text):
         '''
@@ -197,7 +221,6 @@ class statsF(GUI):
 
 
 class upLoadF(GUI):
-    #main buttons
     def __init__(self):
         super().__init__(root)
         self.forget()
