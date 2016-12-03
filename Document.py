@@ -6,7 +6,9 @@ class Document:
         '''
         initiate variables
         '''
-        self.__Slist = []
+        self.filename = filename
+        self.DS = DocumentStream()
+        self.__Slist = self.DS.readWhole(self.filename)
         self.filename = filename
         self.wordlist = []
         self.__id = 0
