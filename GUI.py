@@ -39,57 +39,52 @@ class textFiltersF(GUI):
     def __init__(self):
         super().__init__(root)
         self.forget()
-        labelframe2 = LabelFrame(root, text = 'Files, Check to apply')
-        labelframe2.grid()
- #       labelframe2.grid(row = 2, column = 0, columnspan = 1, sticky = W)
-        labelframe = LabelFrame(root, text = 'Text Filters, Check to Apply')
-        labelframe.grid(row = 2, column = 2, columnspan = 2 ,sticky = N)
-        labelframe1 = LabelFrame(root, text = 'State')
-        labelframe1.grid(row = 2,column = 4, columnspan = 1, sticky = W+E+N+S)
-        variables = []
-        self.sti_text = StringVar()
-        self.sti= "Haven't applied anything"
-        
-        self.sti_text.set(self.sti)
-        
-        stil = Label(labelframe1, textvariable = self.sti_text)
-        stil.grid(columnspan= 2 , sticky = W+E+N+S)
-        for i in range(len(GUI.fileName)):
-            var = IntVar()
-            Checkbutton(labelframe, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
-            variables.append(var)
-        if GUI.fileName == []:
-            welcome = Label(labelframe, text = 'Welcome!\nPlease press upload button to upload the file.')
-            welcome.grid(columnspan = 5)
+        self.variables = []
+        self.fileFrame = LabelFrame(root, text = 'Files')
+        self.files()
+        self.fileFrame.grid(row = 2, column = 0, columnspan = 2, sticky = W+E+N+S)
+        self.filterframe = LabelFrame(root, text = 'Text Filters, Check to Apply')
+        self.filters()
+        self.filterframe.grid(row = 2, column = 2, columnspan = 2,sticky = N)
+        self.stateFrame = LabelFrame(root, text = 'State')
+        self.state()
+        self.stateFrame.grid(row = 2,column = 4, columnspan = 1, sticky = W+E+N+S)
+
+    def filters(self):
         self.varnws = IntVar()
         self.varnc = IntVar()
         self.varsnc = IntVar()
         self.varsn = IntVar()
         self.varfw = IntVar()
         self.filters = ['NWS','NC','SNC','SN','FW']
-        nws = Checkbutton(labelframe, text = 'Nomralize White Space',variable = self.varnws, onvalue = 1, offvalue = 0)
-        nc = Checkbutton(labelframe, text = 'Normalize Cases',variable = self.varnc, onvalue = 1, offvalue = 0)
-        snc = Checkbutton(labelframe, text = 'Strip Null Characters',variable = self.varsnc, onvalue = 1, offvalue = 0)
-        sn = Checkbutton(labelframe, text = 'Strip Numbers',variable = self.varsn, onvalue = 1, offvalue = 0)
-        fw = Checkbutton(labelframe, text = 'Filter Words',variable = self.varfw, onvalue = 1, offvalue = 0)
-        ap = Button(labelframe, text = 'Apply filters',command = lambda: self.applyfilters(variables,[self.varnws, self.varnc, self.varsnc, self.varsn, self.varfw]))
-        
-        '''
-        nws = Button(labelframe, text = 'Nomralize White Space', command = lambda: self.appendFilters(variables, 'NWS'))
-        nc = Button(labelframe, text = 'Normalize Cases', command = lambda: self.appendFilters(variables, 'NC'))
-        snc = Button(labelframe, text = 'Strip Null Characters', command = lambda: self.appendFilters(variables, 'SNC'))
-        sn = Button(labelframe, text = 'Strip Numbers', command = lambda: self.appendFilters(variables, 'SN'))
-        fw = Button(labelframe, text = 'Strip Null Characters', command = lambda: self.appendFilters(variables, 'SNC'))
-        fw = Button(labelframe, text = 'Filter Words', command = lambda: self.appendFilters(variables, 'FW'))
-        ap = Button(labelframe, text = 'Apply filters', command = lambda: self.applyfilters(variables))
-        '''                
-        
+        nws = Checkbutton(self.filterframe, text = 'Nomralize White Space',variable = self.varnws, onvalue = 1, offvalue = 0)
+        nc = Checkbutton(self.filterframe, text = 'Normalize Cases',variable = self.varnc, onvalue = 1, offvalue = 0)
+        snc = Checkbutton(self.filterframe, text = 'Strip Null Characters',variable = self.varsnc, onvalue = 1, offvalue = 0)
+        sn = Checkbutton(self.filterframe, text = 'Strip Numbers',variable = self.varsn, onvalue = 1, offvalue = 0)
+        fw = Checkbutton(self.filterframe, text = 'Filter Words',variable = self.varfw, onvalue = 1, offvalue = 0)
+        ap = Button(self.filterframe, text = 'Apply filters',command = lambda: self.applyfilters(self.variables,[self.varnws, self.varnc, self.varsnc, self.varsn, self.varfw]))
         nws.grid(sticky = 'W')
         nc.grid(sticky = 'W')
         snc.grid(sticky = 'W')
         sn.grid(sticky = 'W')
         fw.grid(sticky = 'W')
         ap.grid(sticky = 'E')
+
+    def state(self):
+        self.sti_text = StringVar()
+        self.sti = "Haven't applied anything"
+        self.sti_text.set(self.sti)
+        stil = Label(self.stateFrame, textvariable = self.sti_text)
+        stil.grid(columnspan= 2 , sticky = W+E+N+S)
+
+    def files(self):
+        for i in range(len(GUI.fileName)):
+            var = IntVar()
+            Checkbutton(self.fileFrame, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
+            self.variables.append(var)
+        if GUI.fileName == []:
+            welcome = Label(self.fileFrame, text = 'Welcome!\nPlease press upload button to upload the file.')
+            welcome.grid()
 
     def applyfilters(self, variables, filterscs):
         empty = True
@@ -106,38 +101,7 @@ class textFiltersF(GUI):
         else:
             self.sti= 'Successfully applied'
         self.sti_text.set(self.sti)
-    
-    '''
-    def appendFilters(self, variables, keyword):
-        if GUI.filters == []:
-            for i in range(len(GUI.fileName)):
-                GUI.filters.append([])
-        for i in range(len(variables)):
-            if variables[i].get() == 1:
-                GUI.filters[i].append(keyword)
-    '''
-    '''
-    def applyfilters(self, variables):
-        print('did')
-        empty = True
-        for i in range(len(variables)):
-            if variables[i].get() == 1:
-                do = Document(GUI.fileName[i])
-                dofil = TextFilter(do)
-                dofil.apply(GUI.filters[i])
-                empty = False
-        if empty:
-            self.sti= 'Nothing applied'
-        else:
-            self.sti= 'Successfully applied'
-        self.sti_text.set(self.sti)
-    '''
-            
-    
- 
 
-                
-    
 class predictF(GUI):
     def __init__(self):
         super().__init__(root)
