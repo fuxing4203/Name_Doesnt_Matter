@@ -7,13 +7,15 @@ from Sentence import *
 from DecisionTree import *
 from BasicStats import *
 from TextFilter import *
-from MatPlotPloter import *
+#from MatPlotPloter import *
 
 class GUI:
     fileName = []
     fileObj = []
     filters = [] #[[filters]]
     charInfo = [] #[[genre, year, topics]]
+    attr = ['None']
+    DT = DecisionTree()
     def __init__(self, root):
         self.root = root
         self.uploadB = Button(text = 'Upload', command = upLoadF)
