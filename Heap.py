@@ -68,8 +68,8 @@ class Heapsort:
             if heapn[way] < heapn[loc]:
                 heapn[loc] = heapn[way]
                 heapn[way] = a
-                heaps[loc] = heaps[rc]
-                heaps[rc] = b
+                heaps[loc] = heaps[way]
+                heaps[way] = b
                 Heapsort.lfixdown(heapn,heaps, way)
 
     def hfixdown(heapn,heaps, rootindex):
@@ -100,8 +100,8 @@ class Heapsort:
             if heapn[way] > heapn[loc]:
                 heapn[loc] = heapn[way]
                 heapn[way] = a
-                heaps[loc] = heaps[rc]
-                heaps[rc] = b
+                heaps[loc] = heaps[way]
+                heaps[way] = b
                 Heapsort.hfixdown(heapn,heaps, way)
 
     def LfixUp(heapn,heaps, index):
