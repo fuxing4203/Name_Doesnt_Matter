@@ -192,9 +192,7 @@ class predictF(GUI):
                 self.odlist += [GUI.attr]
                 for j in self.tdlist:
                     j+= [GUI.charInfo[i]]
-        print([self.odlist, self.tdlist])
         GUI.DT.train(GUI.DT.root, self.tdlist, self.odlist)
-        print('did')
         if self.tdlist != []:
             self.svar_text = 'trained'
         else:
@@ -211,7 +209,6 @@ class predictF(GUI):
         self.thirdk.set(self.odlist[3])
 
     def evaluationF(self):
-
         self.twolist = []
         self.labelframe2 = LabelFrame(self.root, text = 'Evaluate with part of the informations')
         self.labelframe2.grid(row = 2, rowspan = 100, column = 1, columnspan = 100, sticky = W+E+N+S)
@@ -320,32 +317,54 @@ class charInfoF(GUI):
         self.forget()
         labelframe = LabelFrame(self.root, text = 'Characteristic Info')
         labelframe.grid(columnspan = 100)
+        authorB = Button(text = 'Author', command = self.authorF)
         genreB = Button(text = 'Genre', command = self.genreF)
         yearB = Button(text = 'Year', command = self.yearF)
         topicsB = Button(text = 'Topics', command = self.topicsF)
-        genreB.grid(row = 1, column = 0)
-        yearB.grid(row = 1, column = 1)
-        topicsB.grid(row = 1, column = 2)
+        authorB.grid(row = 1, column = 0)
+        genreB.grid(row = 1, column = 1)
+        yearB.grid(row = 1, column = 2)
+        topicsB.grid(row = 1, column = 3)
         if GUI.charInfo == []:
             for i in range(len(GUI.fileName)):
-                GUI.charInfo.append([None, None, None])
+                GUI.charInfo.append([None, None, None, None])
         elif len(GUI.charInfo) != len(GUI.fileName):
             for i in range(len(GUI.fileName) - len(GUI.charInfo)):
-                GUI.charInfo.append([None, None, None])
+                GUI.charInfo.append([None, None, None, None])
         self.genreF()
         self.printInputs()
     def printInputs(self):
         inputframe = LabelFrame(self.root, text = 'Inputs')
         inputframe.grid(row = 2, column = 2, sticky = W+E+N+S, columnspan = 3)
         Label(inputframe, text = ' ').grid(row = 2, column = 3)
-        Label(inputframe, text = 'Genre').grid(row = 2, column = 4)
-        Label(inputframe, text = 'Year').grid(row = 2, column = 5)
-        Label(inputframe, text = 'Topics').grid(row = 2, column = 6)
+        Label(inputframe, text = 'Author'). grid(row = 2, column = 4)
+        Label(inputframe, text = 'Genre').grid(row = 2, column = 5)
+        Label(inputframe, text = 'Year').grid(row = 2, column = 6)
+        Label(inputframe, text = 'Topics').grid(row = 2, column = 7)
         for i in range(len(GUI.charInfo)):
             Label(inputframe, text = GUI.fileName[i]).grid(row = i + 3, column = 3)
-            Label(inputframe, text = GUI.charInfo[i][0]).grid(row = i + 3, column = 4)
-            Label(inputframe, text = GUI.charInfo[i][1]).grid(row = i + 3, column = 5)
-            Label(inputframe, text = GUI.charInfo[i][2]).grid(row = i + 3, column = 6)
+            for m in range(4):
+                Label(inputframe, text = GUI.charInfo[i][m]).grid(row = i + 3, column = 4 + m)
+    def authorF(self):
+        self.forget(2)
+        self.printInputs()
+        authorFrame = LabelFrame(self.root, text = 'Author')
+        authorFrame.grid(row = 2, column = 0, sticky = W+E+N+S, columnspan = 2)
+        vcmd = self.root.register(self.validate)
+        variables = []
+        for i in range(len(GUI.fileName)):
+            var = IntVar()
+            Checkbutton(authorFrame, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
+            variables.append(var)
+        if GUI.fileName == []:
+            welcome = Label(authorFrame, text = 'Welcome!\nPlease press upload button to upload the file.')
+            welcome.grid(columnspan = 5)
+        authorL = Label(authorFrame, text = 'Please enter the author.')
+        author = Entry(authorFrame, validate="key", validatecommand=(vcmd, '%P'))
+        upB = Button(authorFrame, text = 'Add', command = lambda: self.getResult(variables, author))
+        authorL.grid()
+        author.grid()
+        upB.grid()
     def genreF(self):
         self.forget(2)
         self.printInputs()
@@ -362,7 +381,7 @@ class charInfoF(GUI):
             welcome.grid(columnspan = 5)
         genreL = Label(genreFrame, text = 'Please enter the genre.')
         genre = Entry(genreFrame, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(genreFrame, text = 'Add', command = lambda: self.getResult(variables, genre))
+        upB = Button(genreFrame, text = 'Add', command = lambda: self.getResult(variables, genre, 1))
         genreL.grid()
         genre.grid()
         upB.grid()
@@ -382,7 +401,7 @@ class charInfoF(GUI):
             welcome.grid(columnspan = 5)
         yearL = Label(yearFrame, text = 'Please enter the year.')
         year = Entry(yearFrame, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(variables, year, 1))
+        upB = Button(yearFrame, text = 'Add', command = lambda: self.getResult(variables, year, 2))
         yearL.grid()
         year.grid()
         upB.grid()
@@ -402,17 +421,17 @@ class charInfoF(GUI):
             welcome.grid(columnspan = 5)
         topicsL = Label(topicsFrame, text = 'Please enter the year.')
         topics = Entry(topicsFrame, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(topicsFrame, text = 'Add', command = lambda: self.getResult(variables, topics, 2))
+        upB = Button(topicsFrame, text = 'Add', command = lambda: self.getResult(variables, topics, 3))
         topicsL.grid()
         topics.grid()
         upB.grid()
     def getResult(self, variables, info, infoType = 0):
         if GUI.charInfo == []:
             for i in range(len(GUI.fileName)):
-                GUI.charInfo.append([None, None, None])
+                GUI.charInfo.append([None, None, None, None])
         elif len(GUI.charInfo) != len(GUI.fileName):
             for i in range(len(GUI.fileName) - len(GUI.charInfo)):
-                GUI.charInfo.append([None, None, None])
+                GUI.charInfo.append([None, None, None, None])
         for i in range(len(variables)):
             if variables[i].get() == 1:
                 GUI.charInfo[i][infoType] = info.get()
@@ -433,18 +452,15 @@ class statsF(GUI):
         self.forget(2)
         statsframe = LabelFrame(self.root)
         statsframe.grid(columnspan = 5, sticky = E+W+S+N)
-        attr = ['genre', 'year', 'topics', 'author', 'word count', 'line count', 'char count']
+        attr = ['author', 'genre', 'year', 'topics', 'word count', 'line count', 'char count']
         Label(statsframe, text = ' ').grid(row = 2, column = 1)
         for i in range(len(GUI.fileName)):
             Label(statsframe, text = GUI.fileName[i]).grid(row = 2, column = i + 2)
         for i in range(len(attr)):
             Label(statsframe, text = attr[i]).grid(row = i + 3, column = 1)
-            if i >= 0  and i <= 2:
+            if i >= 0  and i <= 3:
                 for m in range(len(GUI.fileObj)):
                     Label(statsframe, text = GUI.charInfo[m][i]).grid(row = i + 3, column = m + 2)
-            elif i == 3:
-                for m in range(len(GUI.fileObj)):
-                    Label(statsframe, text = GUI.fileObj[m].DS.getauthor(GUI.fileName[m])).grid(row = i + 3, column = m + 2)
             elif i == 4:
                 for m in range(len(GUI.fileObj)):
                     Label(statsframe, text = GUI.fileObj[m].getWordCount()).grid(row = i + 3, column = m + 2)
