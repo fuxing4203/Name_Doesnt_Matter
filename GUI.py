@@ -61,6 +61,16 @@ class textFiltersF(GUI):
         self.stateFrame = LabelFrame(root, text = 'State')
         self.state()
         self.stateFrame.grid(row = 2,column = 4, columnspan = 1, sticky = W+E+N+S)
+        if GUI.fileObj == []:
+            for thefile in GUI.fileName:
+                GUI.fileObj.append(Document(thefile))
+            for D in GUI.fileObj:
+                D.generateWhole()
+        elif len(GUI.fileObj) != len(GUI.fileName):
+            lengthD = len(GUI.fileName) - len(GUI.fileObj)
+            for i in range(lengthD)[::-1]:
+                GUI.fileObj.append(Document(GUI.fileName[-(1 + i)]))
+                GUI.fileObj[-1].generateWhole()
     def filters(self):
         self.varnws = IntVar()
         self.varnc = IntVar()
@@ -121,20 +131,28 @@ class predictF(GUI):
     def __init__(self):
         super().__init__(root)
         self.forget()
+        dtB = Button(text = 'Decision Tree', command = self.dtF)
+        pcaB = Button(text = 'PCA', command = self.pcaF)
+        dtB.grid(row = 1, column = 0)
+        pcaB.grid(row = 1, column = 1)
+        self.dtF()
+    #decision tree
+    def dtF(self):
+        self.forget(2)
         trainB = Button(text = 'Train', command = self.trainF)
         evaluationB = Button(text = 'Evaluation', command = self.evaluationF)
-        trainB.grid(row = 1, column = 0, columnspan = 2, sticky = W+E+S+N)
-        evaluationB.grid(row = 2, column = 0, columnspan = 2, sticky = W+E+S+N)
+        trainB.grid(row = 2, column = 0, columnspan = 2, sticky = W+E+S+N)
+        evaluationB.grid(row = 3, column = 0, columnspan = 2, sticky = W+E+S+N)
         self.trainF()
     def trainF(self):
         labelframe1 = LabelFrame(self.root, text = 'Train with desired infos')
-        labelframe1.grid(row = 1, rowspan = 100, column = 2, columnspan = 8, sticky = W+E+N+S)
+        labelframe1.grid(row = 2, rowspan = 100, column = 2, columnspan = 8, sticky = W+E+N+S)
         self.labelframe1of1 = LabelFrame(self.root, labelframe1, text = 'Select classifier')
-        self.labelframe1of1.grid(row = 2, rowspan = 4, column = 2, columnspan = 2, sticky =N)
+        self.labelframe1of1.grid(row = 3, rowspan = 4, column = 2, columnspan = 2, sticky =N)
         self.labelframe2of1 = LabelFrame(self.root, labelframe1, text = 'Select the files')
-        self.labelframe2of1.grid(row = 2, rowspan = 100 , column = 4, columnspan = 5, sticky = W+N+S+E)
+        self.labelframe2of1.grid(row = 3, rowspan = 100 , column = 4, columnspan = 5, sticky = W+N+S+E)
         labelframe3of1 = LabelFrame(self.root, labelframe1, text = 'State')
-        labelframe3of1.grid(row = 3,  column = 9, sticky = W+E+N+S)
+        labelframe3of1.grid(row = 4,  column = 9, sticky = W+E+N+S)
         self.sfiles = []
         self.filesi()
         self.var = StringVar()
@@ -154,7 +172,7 @@ class predictF(GUI):
         self.svar_text = "Haven't\ntrained"
         self.svar.set(self.svar_text)
         applyB = Button(text = 'Apply', command = self.apply(self.var.get(), self.sfiles))
-        applyB.grid(row = 2, column = 9, columnspan = 1, sticky = W+E+N+S)
+        applyB.grid(row = 3, column = 9, columnspan = 1, sticky = W+E+N+S)
         statelabel = Label(labelframe3of1, textvariable = self.svar)
         statelabel.grid()
     def filesi(self):
@@ -166,7 +184,6 @@ class predictF(GUI):
         indexc = GUI.attr.index(classifer)
         self.odlist = [classifer]
         self.tdlist = [[i[indexc]] for i in GUI.charInfo]
-
         for i in range(len(GUI.attr)):
             if GUI.attr[i] != classifer:
                 self.odlist += [GUI.attr]
@@ -188,34 +205,34 @@ class predictF(GUI):
         self.odlist = ['Genre', 'Year','Topic']
         self.twolist = []
         self.labelframe2 = LabelFrame(self.root, text = 'Evaluate with part of the informations')
-        self.labelframe2.grid(row = 1, rowspan = 100, column = 2, columnspan = 100, sticky = W+E+N+S)
+        self.labelframe2.grid(row = 2, rowspan = 100, column = 2, columnspan = 100, sticky = W+E+N+S)
         self.firstk = StringVar()
         self.secondk = StringVar()
         self.setk()
         self.entered_1 = ''
         self.entered_2 = ''
         inputframe1 = LabelFrame(self.labelframe2, text = 'Input known infos')
-        inputframe1.grid(row = 2, rowspan = 4, column = 2, columnspan = 4, sticky = W+N+E+S)
+        inputframe1.grid(row = 3, rowspan = 4, column = 2, columnspan = 4, sticky = W+N+E+S)
         vcmdf = self.root.register(self.validate1)
         vcmds = self.root.register(self.validate2)
         labelf = Label(inputframe1, textvariable = self.firstk)
-        labelf.grid(row = 3, column = 2, columnspan = 1)
+        labelf.grid(row = 4, column = 2, columnspan = 1)
         labels = Label(inputframe1, textvariable = self.secondk)
-        labels.grid(row = 4, column = 2, columnspan = 1)
+        labels.grid(row = 5, column = 2, columnspan = 1)
         entryf = Entry(inputframe1, validate="key", validatecommand=(vcmdf, '%P'))
-        entryf.grid(row = 3, column = 3, columnspan = 2, sticky = W)
+        entryf.grid(row = 4, column = 3, columnspan = 2, sticky = W)
         entrys = Entry(inputframe1, validate="key", validatecommand=(vcmds, '%P'))
-        entrys.grid(row = 4, column = 3, columnspan = 2, sticky = W)
+        entrys.grid(row = 5, column = 3, columnspan = 2, sticky = W)
         infoaddB = Button(inputframe1, text = 'Add', command = lambda: self.add(self.entered_1, self.entered_2))
-        infoaddB.grid(row = 5, column = 2, columnspan = 1, sticky = N)
+        infoaddB.grid(row = 6, column = 2, columnspan = 1, sticky = N)
         inforemoveB = Button(inputframe1, text = 'Remove', command =lambda:  self.remove(self.entered_1, self.entered_2))
-        inforemoveB.grid(row = 5, column = 3, columnspan = 1, sticky = N)
+        inforemoveB.grid(row = 6, column = 3, columnspan = 1, sticky = N)
         self.inputedframe1 = LabelFrame(self.labelframe2, text = 'Inputed known info')
-        self.inputedframe1.grid(row = 6, rowspan = 100, column = 2, columnspan = 4, sticky = W+N+E+S)
+        self.inputedframe1.grid(row = 7, rowspan = 100, column = 2, columnspan = 4, sticky = W+N+E+S)
         predictionB = Button(self.labelframe2, text = 'Predict', command = self.predict)
-        predictionB.grid(row = 2, column = 8, columnspan = 4, sticky = N+W+E)
+        predictionB.grid(row = 3, column = 8, columnspan = 4, sticky = N+W+E)
         self.predictionframe = LabelFrame(self.labelframe2, text = 'Prediction')
-        self.predictionframe.grid(row = 3, column = 6, columnspan = 80, sticky = W)
+        self.predictionframe.grid(row = 4, column = 6, columnspan = 80, sticky = W)
     def validate1(self, new_text):
         '''
         test the validity of the filename inputed
@@ -256,8 +273,19 @@ class predictF(GUI):
                 self.labelist+=[Label(self.inputedframe1, text = 'Info-'+str(i) + ': \n        ' +
                       self.odlist[1] + ': ' + self.twolist[i][1] + ' '+ self.odlist[2] +
                       ': ' + self.twolist[i][2])]
-                self.labelist[i].grid(column = 2, columnspan = 4, sticky = W)
-
+                self.labelist[i].grid(column = 3, columnspan = 4, sticky = W)
+    #pca
+    def pcaF(self):
+        self.forget(2)
+        pcaframe = LabelFrame(self.root)
+        pcaframe.grid(columnspan = 5, sticky = E+W+S+N)
+        nL = Label(bottomNframe, text = 'Please enter N for BottomN')
+        vcmd = self.root.register(self.validate)
+        n = Entry(bottomNframe, validate="key", validatecommand=(vcmd, '%P'))
+        upB = Button(bottomNframe, text = 'Enter', command = lambda: self.getResultBottom(n))
+        nL.grid()
+        n.grid()
+        upB.grid()
 class charInfoF(GUI):
     def __init__(self):
         super().__init__(root)
@@ -270,6 +298,12 @@ class charInfoF(GUI):
         genreB.grid(row = 1, column = 0)
         yearB.grid(row = 1, column = 1)
         topicsB.grid(row = 1, column = 2)
+        if GUI.charInfo == []:
+            for i in range(len(GUI.fileName)):
+                GUI.charInfo.append([None, None, None])
+        elif len(GUI.charInfo) != len(GUI.fileName):
+            for i in range(len(GUI.fileName) - len(GUI.charInfo)):
+                GUI.charInfo.append([None, None, None])
         self.genreF()
         self.printInputs()
     def printInputs(self):
@@ -361,9 +395,11 @@ class statsF(GUI):
         super().__init__(root)
         self.forget()
         topNB = Button(text = 'TopN', command = self.topNF)
+        bottomNB = Button(text = 'BottomN', command = self.BottomNF)
         printStatsB = Button(text = 'Display Statistics', command = self.printStatsF)
         printStatsB.grid(row = 1, column = 0)
         topNB.grid(row = 1, column = 1)
+        bottomNB.grid(row = 1, column = 2)
         self.printStatsF()
     def printStatsF(self):
         self.forget(2)
@@ -397,16 +433,33 @@ class statsF(GUI):
         nL = Label(topNframe, text = 'Please enter N for TopN')
         vcmd = self.root.register(self.validate)
         n = Entry(topNframe, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(topNframe, text = 'Enter', command = lambda: self.getResult(n))
+        upB = Button(topNframe, text = 'Enter', command = lambda: self.getResultTop(n))
         nL.grid()
         n.grid()
         upB.grid()
-    def getResult(self, n):
+    def bottomNF(self):
+        self.forget(2)
+        bottomNframe = LabelFrame(self.root, text = 'BottomN')
+        bottomNframe.grid(columnspan = 5, sticky = E+W+S+N)
+        nL = Label(bottomNframe, text = 'Please enter N for BottomN')
+        vcmd = self.root.register(self.validate)
+        n = Entry(bottomNframe, validate="key", validatecommand=(vcmd, '%P'))
+        upB = Button(bottomNframe, text = 'Enter', command = lambda: self.getResultBottom(n))
+        nL.grid()
+        n.grid()
+        upB.grid()
+    def getResultTop(self, n):
         self.N = int(n.get())
         for m in range(len(GUI.fileObj)):
             worddict = BasicStats.createFreqMap(GUI.fileObj[m].wordlist)
             [maxlistn, maxlists, minlistn, minlists] = BasicStats.HTopNBottomN(worddict, self.N)
-            MatPlotPloter().barGraphfortop(maxlists, maxlistn, GUI.fileName[m])
+            MatPlotPloter().barGraphfortop(maxlists[1:], maxlistn[1:], GUI.fileName[m])
+    def getResultBottom(self, n):
+        self.N = int(n.get())
+        for m in range(len(GUI.fileObj)):
+            worddict = BasicStats.createFreqMap(GUI.fileObj[m].wordlist)
+            [maxlistn, maxlists, minlistn, minlists] = BasicStats.HTopNBottomN(worddict, self.N)
+            MatPlotPloter().barGraphfortop(minlists[1:], minlistn[1:], GUI.fileName[m])
 
 class upLoadF(GUI):
     def __init__(self):
