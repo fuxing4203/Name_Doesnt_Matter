@@ -64,7 +64,6 @@ class TextFilter:
         self.wordlist = result
 
     def apply(self, stringList, D):
-        print(stringList)
         '''
         apply methods and piece back words into a text
         return the text

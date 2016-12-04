@@ -68,7 +68,7 @@ class textFiltersF(GUI):
         self.varsn = IntVar()
         self.varfw = IntVar()
         self.filters = ['NWS','NC','SNC','SN','FW']
-        nws = Checkbutton(self.filterframe, text = 'Nomralize White Space',variable = self.varnws, onvalue = 1, offvalue = 0)
+        nws = Checkbutton(self.filterframe, text = 'Normalize White Space',variable = self.varnws, onvalue = 1, offvalue = 0)
         nc = Checkbutton(self.filterframe, text = 'Normalize Cases',variable = self.varnc, onvalue = 1, offvalue = 0)
         snc = Checkbutton(self.filterframe, text = 'Strip Null Characters',variable = self.varsnc, onvalue = 1, offvalue = 0)
         sn = Checkbutton(self.filterframe, text = 'Strip Numbers',variable = self.varsn, onvalue = 1, offvalue = 0)
@@ -354,7 +354,6 @@ class charInfoF(GUI):
         for i in range(len(variables)):
             if variables[i].get() == 1:
                 GUI.charInfo[i][infoType] = info.get()
-        print(GUI.charInfo)
         self.printInputs()
 
 class statsF(GUI):
@@ -406,12 +405,8 @@ class statsF(GUI):
         self.N = int(n.get())
         for m in range(len(GUI.fileObj)):
             worddict = BasicStats.createFreqMap(GUI.fileObj[m].wordlist)
-            topdict = BasicStats.topN(worddict, self.N)
-            lista = [[],[]]
-            for i in topdict:
-                lista[0] += [i] #words
-                lista[1] += [topdict[i]] #frequency
-            MatPlotPloter().barGraphfortop(lista[0], lista[1], GUI.fileName[m])
+            [maxlistn, maxlists, minlistn, minlists] = BasicStats.HTopNBottomN(worddict, self.N)
+            MatPlotPloter().barGraphfortop(maxlists, maxlistn, GUI.fileName[m])
 
 class upLoadF(GUI):
     def __init__(self):
