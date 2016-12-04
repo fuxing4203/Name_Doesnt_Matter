@@ -7,7 +7,7 @@ from Sentence import *
 from DecisionTree import *
 from BasicStats import *
 from TextFilter import *
-
+from MatPlotPloter import *
 
 class GUI:
     fileName = []
@@ -33,6 +33,18 @@ class GUI:
         for label in root.grid_slaves():
             if int(label.grid_info()["row"]) >= row:
                 label.grid_forget()
+    def validate(self, new_text):
+        '''
+        test the validity of the filename inputed
+        '''
+        if not new_text: # the field is being cleared
+            self.entered_filename = ''
+            return True
+        try:
+            self.entered_filename = new_text
+            return True
+        except ValueError:
+            return False
 
 class textFiltersF(GUI):
     def __init__(self):
@@ -48,8 +60,11 @@ class textFiltersF(GUI):
         self.stateFrame = LabelFrame(root, text = 'State')
         self.state()
         self.stateFrame.grid(row = 2,column = 4, columnspan = 1, sticky = W+E+N+S)
-        for fileN in GUI.fileName:
-            GUI.fileObj.append(Document(fileN))
+        if GUI.fileObj == []:
+            for thefile in GUI.fileName:
+                GUI.fileObj.append(Document(thefile))
+            for D in GUI.fileObj:
+                D.generateWhole()
 
     def filters(self):
         self.varnws = IntVar()
@@ -92,7 +107,7 @@ class textFiltersF(GUI):
         for i in range(len(variables)):
             if variables[i].get() == 1:
                 dofil = TextFilter(GUI.fileObj[i])
-                dofil.apply([self.filters[j] for j in range(len(filterscs)) if filterscs[j].get() == 1])
+                dofil.apply([self.filters[j] for j in range(len(filterscs)) if filterscs[j].get() == 1], GUI.fileObj[i])
                 empty = False
         if empty == True:
             self.sti= 'Nothing applied'
@@ -122,6 +137,9 @@ class charInfoF(GUI):
         genreB.grid(row = 1, column = 0)
         yearB.grid(row = 1, column = 1)
         topicsB.grid(row = 1, column = 2)
+        if GUI.charInfo == []:
+            for i in range(len(GUI.fileName)):
+                GUI.charInfo.append([None, None, None])
         self.genreF()
 
     def genreF(self):
@@ -185,27 +203,11 @@ class charInfoF(GUI):
         upB.grid()
 
     def getResult(self, variables, info, infoType = 0):
-        if GUI.charInfo == []:
-            for i in range(len(GUI.fileName)):
-                GUI.charInfo.append([None, None, None])
         for i in range(len(variables)):
             if variables[i].get() == 1:
                 GUI.charInfo[i][infoType] = info.get()
         print(GUI.charInfo)
 
-    def validate(self, new_text):
-        '''
-        test the validity of the information inputed
-        '''
-        if not new_text: # the field is being cleared
-            self.entered_key = ''
-            return True
-
-        try:
-            self.entered_key = new_text
-            return True
-        except ValueError:
-            return False
 
 class statsF(GUI):
     def __init__(self):
@@ -221,20 +223,48 @@ class statsF(GUI):
         statsframe = LabelFrame(self.root)
         statsframe.grid(columnspan = 5, sticky = E+W+S+N)
         attr = ['genre', 'year', 'topics', 'author', 'word count', 'line count', 'char count']
-        Label(statsframe, text = ' ').grid(row = 2, column = 0)
+        Label(statsframe, text = ' ').grid(row = 2, column = 1)
         for i in range(len(GUI.fileName)):
-            Label(statsframe, text = GUI.fileName[i]).grid(row = 2, column = i + 1)
+            Label(statsframe, text = GUI.fileName[i]).grid(row = 2, column = i + 2)
         for i in range(len(attr)):
-            Label(statsframe, text = attr[i]).grid(row = i + 3, column = 0)
+            Label(statsframe, text = attr[i]).grid(row = i + 3, column = 1)
             if i >= 0  and i <= 2:
                 for m in range(len(GUI.fileObj)):
-                    Label(statsframe, text = GUI.charInfo[m][i]).grid(row = i + 3, column = m + 1)
+                    Label(statsframe, text = GUI.charInfo[m][i]).grid(row = i + 2, column = m + 3)
+            elif i == 3:
+                for m in range(len(GUI.fileObj)):
+                    Label(statsframe, text = GUI.fileObj[m].DS.getauthor(GUI.fileName[m])).grid(row = i + 3, column = m + 2)
+            elif i == 4:
+                for m in range(len(GUI.fileObj)):
+                    Label(statsframe, text = GUI.fileObj[m].getWordCount()).grid(row = i + 3, column = m + 2)
+            elif i == 5:
+                for m in range(len(GUI.fileObj)):
+                    Label(statsframe, text = GUI.fileObj[m].getLineCount()).grid(row = i + 3, column = m + 2)
+            elif i == 6:
+                for m in range(len(GUI.fileObj)):
+                    Label(statsframe, text = GUI.fileObj[m].getCharCount()).grid(row = i + 3, column = m + 2)
+
     def topNF(self):
         self.forget(2)
         topNframe = LabelFrame(self.root, text = 'TopN')
         topNframe.grid(columnspan = 5, sticky = E+W+S+N)
-        pass
-
+        nL = Label(topNframe, text = 'Please enter N for TopN')
+        vcmd = self.root.register(self.validate)
+        n = Entry(topNframe, validate="key", validatecommand=(vcmd, '%P'))
+        upB = Button(topNframe, text = 'Enter', command = lambda: self.getResult(n))
+        nL.grid()
+        n.grid()
+        upB.grid()
+    def getResult(self, n):
+        self.N = int(n.get())
+        for m in range(len(GUI.fileObj)):
+            worddict = BasicStats.createFreqMap(GUI.fileObj[m].wordlist)
+            topdict = BasicStats.topN(worddict, self.N)
+            lista = [[],[]]
+            for i in topdict:
+                lista[0] += [i] #words
+                lista[1] += [topdict[i]] #frequency
+            MatPlotPloter().barGraphfortop(lista[0], lista[1], GUI.fileName[m])
 class upLoadF(GUI):
     def __init__(self):
         super().__init__(root)
@@ -275,18 +305,7 @@ class upLoadF(GUI):
             GUI.fileObj.pop(index)
         self.printFileNames()
 
-    def validate(self, new_text):
-        '''
-        test the validity of the filename inputed
-        '''
-        if not new_text: # the field is being cleared
-            self.entered_filename = ''
-            return True
-        try:
-            self.entered_filename = new_text
-            return True
-        except ValueError:
-            return False
+
 
 
 root = Tk()

@@ -2,15 +2,10 @@ from Document import Document
 class TextFilter:
     def __init__(self, D):
         #D is an object created by initializing Document
-        self.wordlist = []
+        #after generateWhoe
+        self.wordlist = D.wordlist
         self.D = D
         self.text = ''
-        
-        for i in range(len(D)):
-            #wordlist is derived from the sentence list of the document
-
-            self.wordlist.extend(D.getIndexSlist(i).split())
-
     def nSpace(self):
         #nomalizes the white space
         '''
@@ -55,18 +50,20 @@ class TextFilter:
         remove all words provided in the file with given fileName
         '''
         words = []
-        file = open('filterwords.txt', 'r')
-        text = file.read()
-        file.close()
+        fileW = open('filterwords.txt', 'r')
+        text = fileW.read()
+        fileW.close()
         text = text.lower()
         text = text.replace('\t', ' ')
         text = text.replace('\n', ' ')
         words = text.split()
-        for i in range(len(self.wordlist)):
-            if self.wordlist[i] in words:
-                self.pop(i)
+        result = []
+        for word in self.wordlist:
+            if word not in words:
+                result.append(word)
+        self.wordlist = result
 
-    def apply(self, stringList):
+    def apply(self, stringList, D):
         print(stringList)
         '''
         apply methods and piece back words into a text
@@ -92,9 +89,8 @@ class TextFilter:
         for i in range(len(self.wordlist)):
             self.text += self.wordlist[i] + ' '
         filename = self.D.filename[:-4] + 'M' + '.txt'
-        file = open(filename, 'wt',encoding = 'UTF-8')
-        print('did2')
+        file = open(filename, 'w')
         file.write(self.text)
         file.close()
-
-        
+        D.wordlist = self.wordlist
+#GrimmFairyTales.txt
