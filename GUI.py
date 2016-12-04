@@ -7,7 +7,7 @@ from Sentence import *
 from DecisionTree import *
 from BasicStats import *
 from TextFilter import *
-#from MatPlotPloter import *
+from MatPlotPloter import *
 
 class GUI:
     fileName = []
