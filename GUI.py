@@ -230,7 +230,7 @@ class statsF(GUI):
             Label(statsframe, text = attr[i]).grid(row = i + 3, column = 1)
             if i >= 0  and i <= 2:
                 for m in range(len(GUI.fileObj)):
-                    Label(statsframe, text = GUI.charInfo[m][i]).grid(row = i + 2, column = m + 3)
+                    Label(statsframe, text = GUI.charInfo[m][i]).grid(row = i + 3, column = m + 2)
             elif i == 3:
                 for m in range(len(GUI.fileObj)):
                     Label(statsframe, text = GUI.fileObj[m].DS.getauthor(GUI.fileName[m])).grid(row = i + 3, column = m + 2)
