@@ -181,8 +181,8 @@ class BasicStats:
         minlists = [0]
         for i in adict:
             if len(maxlistn) < n + 1:
-                Heapsort.HheapAdd(maxlistn,maxlists, adict[i], i)
-                Heapsort.LheapAdd(minlistn, minlists, adict[i], i)
+                Heapsort.LheapAdd(maxlistn,maxlists, adict[i], i)
+                Heapsort.HheapAdd(minlistn, minlists, adict[i], i)
             else:
                 if adict[i] > maxlistn[1]:
                     maxlistn[1] = adict[i]
