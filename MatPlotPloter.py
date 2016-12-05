@@ -8,15 +8,19 @@ class MatPlotPloter:
         """
         self.figure = 1
 
-    def scatterPlot(self, x, y):
+    def scatterPlot(self, X, Y):
         """
         do a scatter plot with two lists x and y
         """
-
         plt.figure(self.figure)
         self.figure += 1
-        colors = np.random.rand(len(y))
-        plt.scatter(x, y, s = 100, c = colors, alpha = 0.5)
+        xt = [X[i][0] for i in range(len(X))]
+        yt = [X[i][1] for i in range(len(X))]
+        xe = [Y[i][0] for i in range(len(Y))]
+        ye = [Y[i][1] for i in range(len(Y))]
+        trainX = plt.scatter(xt, yt, s = 100, c = 'r', alpha = 0.5)
+        evalY = plt.scatter(xe, ye, s = 100, c = 'g', alpha = 0.5)
+        plt.legend((trainX, evalY),('Training Data', 'Eval Data'))
         plt.show()
 
     def barGraph(self, x, y):
@@ -30,7 +34,9 @@ class MatPlotPloter:
         plt.show()
 
     def barGraphfortop(self, x, y, book = 'None Given'):
-
+        '''
+        a bar graph to show the words and its frequency
+        '''
         y_pos = np.arange(len(x))
         plt.barh(y_pos, y, height = 0.5-(4/(len(y_pos)+2)),align='center', alpha=0.2)
         plt.yticks(y_pos, x)

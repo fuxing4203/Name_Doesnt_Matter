@@ -17,6 +17,10 @@ class DecisionTree:
         self.odlist = None
 
     def train(self, root, tdlist, odlist, maxd = None):
+        '''
+        train the decision tree with given values of attributes -> tdlist
+        odlist contains attribute names
+        '''
         if root == self.root:
             self.odlist = odlist
         classifier = odlist[0]
@@ -90,6 +94,7 @@ class DecisionTree:
 
 
     def catagorizediff(self, tdlist, columnnum = None):
+        #calculate the difference of attributes in tdlist
         ddiff = {}
         for i in tdlist:
             if i != None:
@@ -106,6 +111,7 @@ class DecisionTree:
 
 
     def igcaculate(self,diction):
+        #calculate the information gain
         total = 0
         for i in diction:
             total += diction[i]
@@ -128,6 +134,7 @@ class DecisionTree:
 
 
     def eval(self, tdlist):
+        #evaluate the tdlist by changing the first column to correct filename
         for i in range(len(tdlist)):
             root = self.root
             while root.children!= None:
@@ -153,6 +160,7 @@ class DecisionTree:
         return tdlist
 
     def isint(self, s):
+        # find out if s is and integer
         try:
             int(s)
             return True

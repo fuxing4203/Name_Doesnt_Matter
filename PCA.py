@@ -9,6 +9,12 @@ class PCA:
         self.n = n
 
     def processData(self):
+        '''
+        create a 2d list for PCA
+        processedList is in forms of [[filename, probs of words]]
+        each row is a document and columns are words
+        wordlist is created by the top n words for the first document
+        '''
         fileA = Document(self.LoDM[0])
         fileA.generateWhole()
         wordlist = fileA.wordlist

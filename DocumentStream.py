@@ -80,4 +80,5 @@ class DocumentStream:
         return firstbooksecondauthor
 
     def getauthor(self, filename):
+        #slice and return the proper author
         return self.parsetitleauthor(filename)[1][4:-1]

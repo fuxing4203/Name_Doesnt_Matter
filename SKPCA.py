@@ -41,6 +41,11 @@ class SKPCA:
         self.X = self.pca_h.transform(x)
 
     def evaluation(self, labels, labelsObj):
+        '''
+        labels are filenames
+        labelsObj are file objects
+        return the result filename, X and Y for plotting
+        '''
         data = []
         for i in range(len(labelsObj)):
             prob = [None]
@@ -74,14 +79,3 @@ class SKPCA:
             distance.append(dm)
         result = [self.labels[i] for i in index]
         return (result, self.X, Y)
-
-'''
-for x in range(1000):
-    a = SKPCA()
-    a.train(['GrimmFairyTales.txt', 'Ulysses.txt'], 10)
-    print(a.X)
-    data = [[None, 0.01008221175522577, 0.04656427769730342, 0.14273380466793933, 0.02001093598610938, 0.035561140796024675, 0.01730571836957877, 0.06195140201260516, 0.06767840526462209, 0.047609911456884396, 0.0790268890956707]]
-    if a.evaluation(data) != 'GrimmFairyTales.txt':
-        print('x:', x)
-        raise Exception
-'''

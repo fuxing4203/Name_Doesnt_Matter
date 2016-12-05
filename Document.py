@@ -114,6 +114,7 @@ class Document:
         return self.__linecount
 
     def getCharCount(self):
+        #return the character count
         self.__charcount = 0
         for item in self.__Slist:
             wl = item.split()

@@ -66,7 +66,7 @@ class TextFilter:
     def apply(self, stringList, D):
         '''
         apply methods and piece back words into a text
-        return the text
+        write out the modified file and pass back the wordlist
         '''
         #apply the methods
         for i in range(len(stringList)):
