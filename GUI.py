@@ -18,6 +18,10 @@ class GUI:
     attr = ['None']
     DT = DecisionTree()
     def __init__(self, root):
+        '''
+        Initialize the first interface that gives a line of instruction that tells the user to 
+        go to the upload
+        '''
         self.root = root
         self.uploadB = Button(text = 'Upload', command = upLoadF)
         self.chrInfoB = Button(text = 'Characteristic Info', command = charInfoF)
@@ -32,6 +36,10 @@ class GUI:
         welcome = Label(root, text = 'Welcome!\nPlease press upload button to upload the file.')
         welcome.grid(columnspan = 5)
     def forget(self, row = 1):
+        '''
+        This method clears the frame with the inputted row number, if not inputted, use default v
+        value of 1
+        '''
         for label in root.grid_slaves():
             if int(label.grid_info()["row"]) >= row:
                 label.grid_forget()
@@ -50,6 +58,12 @@ class GUI:
 
 class textFiltersF(GUI):
     def __init__(self):
+        '''
+        This function inherits from the GUI class and constructs the interface frames for 
+        textfilters, which contains three frames that leads to three frames doing separate works
+        The three frames are the fileframe filterframe and a state frame that tells whether the 
+        filters are being applied
+        '''
         super().__init__(root)
         self.forget()
         self.variables = []
@@ -73,6 +87,10 @@ class textFiltersF(GUI):
                 GUI.fileObj.append(Document(GUI.fileName[-(1 + i)]))
                 GUI.fileObj[-1].generateWhole()
     def filters(self):
+        '''
+        This method allows the user to check the filters they want to apply on the files they 
+        selected and then there is a button that enable them to execute with clicking 
+        '''
         self.varnws = IntVar()
         self.varnc = IntVar()
         self.varsnc = IntVar()
@@ -92,12 +110,23 @@ class textFiltersF(GUI):
         fw.grid(sticky = 'W')
         ap.grid(sticky = 'E')
     def state(self):
+        '''
+        This method allows the user to see whether the filters are applied by giving the variable string
+        that changes according to the application of filters
+        
+        '''
         self.sti_text = StringVar()
         self.sti = "Haven't applied anything"
         self.sti_text.set(self.sti)
         stil = Label(self.stateFrame, textvariable = self.sti_text)
         stil.grid(columnspan= 2 , sticky = W+E+N+S)
     def files(self):
+        
+        '''
+        This method prints out the filename that was inputed and gives the user the choice
+        to check them if they want to apply the filters on it.
+        
+        '''
         for i in range(len(GUI.fileName)):
             var = IntVar()
             Checkbutton(self.fileFrame, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
@@ -106,6 +135,11 @@ class textFiltersF(GUI):
             welcome = Label(self.fileFrame, text = 'Welcome!\nPlease press upload button to upload the file.')
             welcome.grid()
     def applyfilters(self, variables, filterscs):
+        '''
+        This method applies the filters to the files by taking in the two list, one of which contains
+        the files checked to apply, the other one contains the filters checked to apply, and this 
+        method will change the state string accordingly
+        '''
         if GUI.fileObj == []:
             for thefile in GUI.fileName:
                 GUI.fileObj.append(Document(thefile))
@@ -130,6 +164,13 @@ class textFiltersF(GUI):
 
 class predictF(GUI):
     def __init__(self):
+        '''
+        This method creates the frame and the construction for prediction
+        It inherits from the GUI class
+        There are two buttons that enables the user to choice which kind of decision method 
+        they want to use
+        And it also leads to the dtF method which constructs the train, evaluate frame 
+        '''
         super().__init__(root)
         self.forget()
         dtB = Button(text = 'ID3', command = self.dtF)
@@ -139,6 +180,10 @@ class predictF(GUI):
         self.dtF()
     #decision tree
     def dtF(self):
+        '''
+        This method creates the buttons for train and evaluate, and call the trainF funtion defaultly
+        , which calls to the frame of train
+        '''
         self.forget(2)
         trainB = Button(text = 'Train', command = self.trainF)
         evaluationB = Button(text = 'Evaluation', command = self.evaluationF)
@@ -146,6 +191,9 @@ class predictF(GUI):
         evaluationB.grid(row = 3, column = 0, columnspan = 1, sticky = W+E+S+N)
         self.trainF()
     def trainF(self):
+        '''
+        This method creates the train frame which contains 
+        '''
         labelframe1 = LabelFrame(self.root, text = 'Train with desired infos')
         labelframe1.grid(row = 2, rowspan = 100, column = 1, columnspan = 9, sticky = W+E+N+S)
         self.labelframe1of1 = LabelFrame(self.root, labelframe1, text = 'Select classifier')
@@ -161,6 +209,7 @@ class predictF(GUI):
         self.selection= StringVar()
         self.selection_text = "You selected:\n" + str(self.var.get())
         self.selection.set(self.selection_text)
+
         R1 = Radiobutton(self.labelframe1of1, text="Genre", variable=self.var, value='Genre',command=self.sel)
         R1.grid(sticky = W)
         R2 = Radiobutton(self.labelframe1of1, text="Year", variable=self.var, value='Year',command=self.sel)
@@ -169,32 +218,46 @@ class predictF(GUI):
         R3.grid(sticky = W)
         R4 = Radiobutton(self.labelframe1of1, text="Author", variable=self.var, value='Author',command=self.sel)
         R4.grid(sticky = W)
-        label  = Label(self.labelframe1of1, textvariable = self.selection)
-        label.grid(sticky = W+E)
         self.svar = StringVar()
         self.svar_text = "Haven't\ntrained"
         self.svar.set(self.svar_text)
-        applyB = Button(text = 'Apply', command = self.apply(self.var.get(), self.sfiles))
-        applyB.grid(row = 3, column = 8, columnspan = 1, sticky = W+E+N+S)
+
+        label  = Label(self.labelframe1of1, textvariable = self.selection)
+        label.grid(sticky = W+E)
         statelabel = Label(labelframe3of1, textvariable = self.svar)
+        applyB = Button(text = 'Apply', command = lambda: self.apply(self.var.get(), self.sfiles))
+
+        print(self.var.get())
+
+        applyB.grid(row = 3, column = 8, columnspan = 1, sticky = W+E+N+S)
+
         statelabel.grid()
     def filesi(self):
         for i in range(len(GUI.fileName)):
             var = IntVar()
             Checkbutton(self.labelframe2of1, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
             self.sfiles.append(var)
-    def apply(self, classifer, files):
+    def apply(self, classifier, files):
+
+        if classifier == 'None':
+            return 
+  
+
         self.attr = ['Author','Genre','Year','Topic']
-        indexc = GUI.attr.index(classifer)
-        self.odlist = [classifer]
+        indexc = self.attr.index(classifier)
+        self.odlist = [classifier]
         self.tdlist = [[i[indexc]] for i in GUI.charInfo]
-        for i in range(len(GUI.attr)):
-            if GUI.attr[i] != classifer:
-                self.odlist += [GUI.attr]
-                for j in self.tdlist:
-                    j+= [GUI.charInfo[i]]
-        GUI.DT.train(GUI.DT.root, self.tdlist, self.odlist)
         if self.tdlist != []:
+                
+            for i in range(len(self.attr)):
+                if self.attr[i] != classifier:
+                    self.odlist += [self.attr[i]]
+                    for j in range(len(self.tdlist)):
+                        self.tdlist[j]+= [GUI.charInfo[j][i]]
+
+            GUI.DT.train(GUI.DT.root, self.tdlist, self.odlist)
+
+        if GUI.DT.root != None:
             self.svar_text = 'trained'
         else:
             self.svar_text = "Haven't\ntrained"
@@ -202,6 +265,7 @@ class predictF(GUI):
     def sel(self):
         self.selection_text = "You selected:\n" + str(self.var.get())
         self.selection.set(self.selection_text)
+
     def setk(self):
         if self.svar.get() != 'trained':
             self.odlist = ['Author','Genre','Year','Topic']
@@ -235,12 +299,10 @@ class predictF(GUI):
         entryf.grid(row = 4, column = 3, columnspan = 2, sticky = W)
         entrys = Entry(inputframe1, validate="key", validatecommand=(vcmds, '%P'))
         entrys.grid(row = 5, column = 3, columnspan = 2, sticky = W)
-        entrys = Entry(inputframe1, validate="key", validatecommand=(vcmds, '%P'))
-        entrys.grid(row = 6, column = 3, columnspan = 2, sticky = W)
+        entryt = Entry(inputframe1, validate="key", validatecommand=(vcmdt, '%P'))
+        entryt.grid(row = 6, column = 3, columnspan = 2, sticky = W)
         infoaddB = Button(inputframe1, text = 'Add', command = lambda: self.add(self.entered_1, self.entered_2, self.entered_3))
         infoaddB.grid(row = 7, column = 2, columnspan = 1, sticky = N)
-        inforemoveB = Button(inputframe1, text = 'Remove', command =lambda:  self.remove(self.entered_1, self.entered_2,self.entered_3))
-        inforemoveB.grid(row = 7, column = 3, columnspan = 1, sticky = N)
         self.inputedframe1 = LabelFrame(self.labelframe2, text = 'Inputed known info')
         self.inputedframe1.grid(row = 8, rowspan = 100, column = 2, columnspan = 4, sticky = W+N+E+S)
         predictionB = Button(self.labelframe2, text = 'Predict', command = self.predict)
@@ -291,9 +353,14 @@ class predictF(GUI):
                                + str(self.twolist[i][0]) + '('+self.odlist[0]+')')]
             labelist2[i].grid(column = 6, columnspan = 2, sticky= W)
     def add(self, f, s,t):
+        print([f,s,t])
+        print(self.odlist)
+        print(self.tdlist)
+        
         if f!= '' and s!= '' and t!= '':
             self.twolist += [[None, f, s, t]]
         if self.twolist != []:
+            print(self.twolist)
             self.labelist = []
             for i in range(len(self.twolist)):
                 self.labelist+=[Label(self.inputedframe1, text = 'Info-'+str(i) + ': \n        ' +

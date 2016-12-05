@@ -16,11 +16,13 @@ class DecisionTree:
         self.root = root
         self.odlist = None
 
-    def train(self, root, tdlist, odlist, maxd = None):
+    def train(self, root, otdlist, oodlist, maxd = None):
         '''
         train the decision tree with given values of attributes -> tdlist
         odlist contains attribute names
         '''
+        odlist =   deepcopy(oodlist)
+        tdlist = deepcopy(otdlist)
         if root == self.root:
             self.odlist = odlist
         classifier = odlist[0]
