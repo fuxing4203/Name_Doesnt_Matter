@@ -99,6 +99,7 @@ class Document:
         '''
         count how many words are there in a file by splitting with space
         '''
+        self.__wordcount = 0
         for item in self.__Slist:
             self.__wordcount += len(item.split())
         return self.__wordcount
@@ -107,11 +108,13 @@ class Document:
         '''
         count number of lines identified by "\n"
         '''
+        self.__linecount = 0
         for item in self.__Slist:
             self.__linecount += item.count('\n')
         return self.__linecount
 
     def getCharCount(self):
+        self.__charcount = 0
         for item in self.__Slist:
             wl = item.split()
             for word in wl:

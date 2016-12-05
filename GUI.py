@@ -8,6 +8,7 @@ from DecisionTree import *
 from BasicStats import *
 from TextFilter import *
 from MatPlotPloter import *
+from SKPCA import *
 
 class GUI:
     fileName = []
@@ -302,15 +303,56 @@ class predictF(GUI):
     #pca
     def pcaF(self):
         self.forget(2)
-        pcaframe = LabelFrame(self.root)
-        pcaframe.grid(columnspan = 5, sticky = E+W+S+N)
-        nL = Label(bottomNframe, text = 'Please enter N for BottomN')
+        self.nF()
+        self.selectF()
+        self.buttonF()
+    def nF(self):
+        nframe = LabelFrame(self.root)
+        nframe.grid(row = 2, column = 0, columnspan = 2, sticky = E+W+S+N)
+        nL = Label(nframe, text = 'Please enter N for PCA')
         vcmd = self.root.register(self.validate)
-        n = Entry(bottomNframe, validate="key", validatecommand=(vcmd, '%P'))
-        upB = Button(bottomNframe, text = 'Enter', command = lambda: self.getResultBottom(n))
+        self.nE = Entry(nframe, validate="key", validatecommand=(vcmd, '%P'))
         nL.grid()
-        n.grid()
-        upB.grid()
+        self.nE.grid()
+    def selectF(self):
+        selectframe = LabelFrame(self.root, text = 'Please select files')
+        selectframe.grid(row = 2, column = 2, columnspan = 2, sticky = E+W+S+N)
+        self.variables = []
+        for i in range(len(GUI.fileName)):
+            var = IntVar()
+            Checkbutton(selectframe, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
+            self.variables.append(var)
+    def buttonF(self):
+        Button(text = 'Train', command = self.pcaTrain).grid(row = 2, column = 5, columnspan = 1, sticky = E+W+S+N)
+        Button(text = 'Evaluation', command = self.pcaEval).grid(row = 3, column = 5, columnspan = 1, sticky = E+W+S+N)
+        Label(text = 'Status\nNothing has been done yet').grid(row = 4, column = 5)
+    def pcaTrain(self):
+        tlnames = []
+        tlobjs = []
+        for i in range(len(self.variables)):
+            if self.variables[i].get() == 1:
+                tlnames.append(GUI.fileName[i])
+                tlobjs.append(GUI.fileObj[i])
+        self.n = int(self.nE.get())
+        self.pca = SKPCA()
+        self.pca.train(tlnames, tlobjs, self.n)
+        self.forget(4)
+        Label(text = 'Status\nTrained').grid(row = 4, column = 5)
+    def pcaEval(self):
+        evnames = []
+        evobjs = []
+        for i in range(len(self.variables)):
+            if self.variables[i].get() == 1:
+                evnames.append(GUI.fileName[i])
+                evobjs.append(GUI.fileObj[i])
+        (result, X, Y) = self.pca.evaluation(evnames, evobjs)
+        self.forget(4)
+        Label(text = 'Result in order').grid(row = 4, column = 5)
+        index = [GUI.fileName.index(item) for item in result]
+        for i in index:
+            Label(text = GUI.charInfo[i][0]).grid(row = 5, column = 5)
+        MatPlotPloter().scatterPlot(X, Y)
+
 class charInfoF(GUI):
     def __init__(self):
         super().__init__(root)
@@ -331,7 +373,7 @@ class charInfoF(GUI):
         elif len(GUI.charInfo) != len(GUI.fileName):
             for i in range(len(GUI.fileName) - len(GUI.charInfo)):
                 GUI.charInfo.append([None, None, None, None])
-        self.genreF()
+        self.authorF()
         self.printInputs()
     def printInputs(self):
         inputframe = LabelFrame(self.root, text = 'Inputs')
