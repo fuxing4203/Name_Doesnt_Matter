@@ -23,6 +23,7 @@ class SKTree:
         self.depth = depth
 
         data = self.getdict(data)
+
         x = [None]*len(data)
         y = [None]*len(data)
 
@@ -40,6 +41,7 @@ class SKTree:
     def eval(self, data):
         """We assume that data is a 2D python list, with the target [0] == None"""
         data = self.getdict(data)
+ 
         x = [None]*len(data)
         for row in range(len(data)):
             t = []
@@ -47,9 +49,10 @@ class SKTree:
                 t += [data[row][col]]
             x[row] = t
 
-        y = self.tree.predict(y)
+        y = self.tree.predict(x)
+
         #Now you will have to get the values from y and move them to the targe column of data
-        for i in range(len(t)):
+        for i in range(len(x)):
             x[i][0] = y[i]
         result = []
         for row in x:
@@ -61,7 +64,7 @@ class SKTree:
     def toDot(self, filename):
         dot_data = export_graphviz(self.tree, out_file=filename, feature_names=self.labels)
 
-    def getdict(self):
+    def getdict(self, data):
         result = []
         for row in data:
             resultrow = []

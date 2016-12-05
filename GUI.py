@@ -9,6 +9,7 @@ from BasicStats import *
 from TextFilter import *
 from MatPlotPloter import *
 from SKPCA import *
+from SKTree import *
 
 class GUI:
     fileName = []
@@ -17,6 +18,7 @@ class GUI:
     charInfo = [] #['Author','Genre','Year','Topic']
     attr = ['None']
     DT = DecisionTree()
+    DTSK = SKTree()
     def __init__(self, root):
         '''
         Initialize the first interface that gives a line of instruction that tells the user to
@@ -173,10 +175,17 @@ class predictF(GUI):
         '''
         super().__init__(root)
         self.forget()
-        dtB = Button(text = 'ID3', command = self.dtF)
+        self.treevar = StringVar()
+        self.treevar.set('None')
+        self.treef = LabelFrame(self.root, text = 'Select Tree')
+
+        DTB = Radiobutton(text="ID3", variable=self.treevar, value='ID3')
+        SKTB  = Radiobutton( text  = 'SKtree', variable= self.treevar, value = 'SKT')
         pcaB = Button(text = 'PCA', command = self.pcaF)
-        dtB.grid(row = 1, column = 0, columnspan = 1, sticky = W+E+S+N)
-        pcaB.grid(row = 1, column = 1, columnspan = 1, sticky = W)
+
+        DTB.grid(row = 1, rowspan = 1,column = 0, columnspan = 2, sticky = W)
+        SKTB.grid( row = 1, rowspan =1, column = 2, columnspan = 2, sticky = W)
+        pcaB.grid(row = 1, column = 5, columnspan = 1, sticky = W)
         self.dtF()
     #decision tree
     def dtF(self):
@@ -187,21 +196,21 @@ class predictF(GUI):
         self.forget(2)
         trainB = Button(text = 'Train', command = self.trainF)
         evaluationB = Button(text = 'Evaluation', command = self.evaluationF)
-        trainB.grid(row = 2, column = 0, columnspan = 1, sticky = W+E+S+N)
-        evaluationB.grid(row = 3, column = 0, columnspan = 1, sticky = W+E+S+N)
+        trainB.grid(row = 3, column = 0, columnspan = 1, sticky = W+E+S+N)
+        evaluationB.grid(row = 4, column = 0, columnspan = 1, sticky = W+E+S+N)
         self.trainF()
     def trainF(self):
         '''
         This method creates the train frame which belongs to the ID3 method
         '''
         labelframe1 = LabelFrame(self.root, text = 'Train with desired infos')
-        labelframe1.grid(row = 2, rowspan = 100, column = 1, columnspan = 9, sticky = W+E+N+S)
+        labelframe1.grid(row = 3, rowspan = 100, column = 1, columnspan = 9, sticky = W+E+N+S)
         self.labelframe1of1 = LabelFrame(self.root, labelframe1, text = 'Select classifier')
-        self.labelframe1of1.grid(row = 3, rowspan = 4, column = 1, columnspan = 2, sticky =N)
+        self.labelframe1of1.grid(row = 4, rowspan = 4, column = 1, columnspan = 2, sticky =N)
         self.labelframe2of1 = LabelFrame(self.root, labelframe1, text = 'Select the files')
-        self.labelframe2of1.grid(row = 3, rowspan = 100 , column = 3, columnspan = 5, sticky = W+N+S+E)
+        self.labelframe2of1.grid(row = 4, rowspan = 100 , column = 3, columnspan = 5, sticky = W+N+S+E)
         labelframe3of1 = LabelFrame(self.root, labelframe1, text = 'State')
-        labelframe3of1.grid(row = 4,  column = 8, sticky = W+E+N+S)
+        labelframe3of1.grid(row =5,  column = 8, sticky = W+E+N+S)
         self.sfiles = []
         self.filesi()
         self.var = StringVar()
@@ -225,11 +234,11 @@ class predictF(GUI):
         label  = Label(self.labelframe1of1, textvariable = self.selection)
         label.grid(sticky = W+E)
         statelabel = Label(labelframe3of1, textvariable = self.svar)
-        applyB = Button(text = 'Apply', command = lambda: self.apply(self.var.get(), self.sfiles))
+        applyB = Button(text = 'Apply', command = lambda: self.apply(self.var.get(), self.sfiles, self.treevar.get()))
 
-        print(self.var.get())
 
-        applyB.grid(row = 3, column = 8, columnspan = 1, sticky = W+E+N+S)
+
+        applyB.grid(row = 4, column = 8, columnspan = 1, sticky = W+E+N+S)
 
         statelabel.grid()
     def filesi(self):
@@ -241,7 +250,7 @@ class predictF(GUI):
             var = IntVar()
             Checkbutton(self.labelframe2of1, text = GUI.fileName[i], variable = var, onvalue = 1, offvalue = 0).grid()
             self.sfiles.append(var)
-    def apply(self, classifier, files):
+    def apply(self, classifier, files, tree):
         '''
         This method train the program with selected files and classifier
         This method will check which classifer was selected and then creates the two dimensional list
@@ -251,6 +260,9 @@ class predictF(GUI):
 
         if classifier == 'None':
             return
+        if tree == 'None':
+            tree = 'ID3'
+
 
 
         self.attr = ['Author','Genre','Year','Topic']
@@ -259,15 +271,20 @@ class predictF(GUI):
         self.tdlist = [[i[indexc]] for i in GUI.charInfo]
         if self.tdlist != []:
 
+
             for i in range(len(self.attr)):
                 if self.attr[i] != classifier:
                     self.odlist += [self.attr[i]]
                     for j in range(len(self.tdlist)):
                         self.tdlist[j]+= [GUI.charInfo[j][i]]
 
-            GUI.DT.train(GUI.DT.root, self.tdlist, self.odlist)
+            if tree == 'ID3':
+                GUI.DT.train(GUI.DT.root, self.tdlist, self.odlist)
+            elif tree == 'SKT':
+                GUI.DTSK.train(self.tdlist, self.odlist, 10)
 
-        if GUI.DT.root != None:
+
+        if GUI.DT.root != None or GUI.DTSK.tree != None:
             self.svar_text = 'trained'
         else:
             self.svar_text = "Haven't\ntrained"
@@ -299,7 +316,7 @@ class predictF(GUI):
         '''
         self.twolist = []
         self.labelframe2 = LabelFrame(self.root, text = 'Evaluate with part of the informations')
-        self.labelframe2.grid(row = 2, rowspan = 100, column = 1, columnspan = 100, sticky = W+E+N+S)
+        self.labelframe2.grid(row = 3, rowspan = 100, column = 1, columnspan = 100, sticky = W+E+N+S)
         self.firstk = StringVar()
         self.secondk = StringVar()
         self.thirdk = StringVar()
@@ -308,30 +325,30 @@ class predictF(GUI):
         self.entered_2 = ''
         self.entered_3 = ''
         inputframe1 = LabelFrame(self.labelframe2, text = 'Input known infos')
-        inputframe1.grid(row = 3, rowspan = 4, column = 2, columnspan = 4, sticky = W+N+E+S)
+        inputframe1.grid(row = 4, rowspan = 4, column = 2, columnspan = 4, sticky = W+N+E+S)
         vcmdf = self.root.register(self.validate1)
         vcmds = self.root.register(self.validate2)
         vcmdt = self.root.register(self.validate3)
         labelf = Label(inputframe1, textvariable = self.firstk)
-        labelf.grid(row = 4, column = 2, columnspan = 1)
+        labelf.grid(row = 5, column = 2, columnspan = 1)
         labels = Label(inputframe1, textvariable = self.secondk)
-        labels.grid(row = 5, column = 2, columnspan = 1)
+        labels.grid(row =6, column = 2, columnspan = 1)
         labelt = Label(inputframe1, textvariable = self.thirdk)
-        labelt.grid(row = 6, column = 2, columnspan = 1)
+        labelt.grid(row = 7, column = 2, columnspan = 1)
         entryf = Entry(inputframe1, validate="key", validatecommand=(vcmdf, '%P'))
-        entryf.grid(row = 4, column = 3, columnspan = 2, sticky = W)
+        entryf.grid(row = 5, column = 3, columnspan = 2, sticky = W)
         entrys = Entry(inputframe1, validate="key", validatecommand=(vcmds, '%P'))
-        entrys.grid(row = 5, column = 3, columnspan = 2, sticky = W)
+        entrys.grid(row = 6, column = 3, columnspan = 2, sticky = W)
         entryt = Entry(inputframe1, validate="key", validatecommand=(vcmdt, '%P'))
-        entryt.grid(row = 6, column = 3, columnspan = 2, sticky = W)
+        entryt.grid(row = 7, column = 3, columnspan = 2, sticky = W)
         infoaddB = Button(inputframe1, text = 'Add', command = lambda: self.add(self.entered_1, self.entered_2, self.entered_3))
-        infoaddB.grid(row = 7, column = 2, columnspan = 1, sticky = N)
+        infoaddB.grid(row = 8, column = 2, columnspan = 1, sticky = N)
         self.inputedframe1 = LabelFrame(self.labelframe2, text = 'Inputed known info')
-        self.inputedframe1.grid(row = 8, rowspan = 100, column = 2, columnspan = 4, sticky = W+N+E+S)
+        self.inputedframe1.grid(row = 9, rowspan = 100, column = 2, columnspan = 4, sticky = W+N+E+S)
         predictionB = Button(self.labelframe2, text = 'Predict', command = self.predict)
-        predictionB.grid(row = 3, column = 8, columnspan = 4, sticky = N+W+E)
+        predictionB.grid(row = 4, column = 8, columnspan = 4, sticky = N+W+E)
         self.predictionframe = LabelFrame(self.labelframe2, text = 'Prediction')
-        self.predictionframe.grid(row = 4, column = 6, columnspan = 80, sticky = W)
+        self.predictionframe.grid(row = 5, column = 6, columnspan = 80, sticky = W)
     def validate1(self, new_text):
         '''
         test the validity of the filename inputed
@@ -374,12 +391,23 @@ class predictF(GUI):
         '''
         this method prints out the prediction outcome after evaluation
         '''
-        self.twolist = self.DT.eval(self.twolist)
-        labelist2= []
-        for i in range(len(self.twolist)):
-            labelist2+= [Label(self.predictionframe, text = 'Info-'+str(i) +' - '
-                               + str(self.twolist[i][0]) + '('+self.odlist[0]+')')]
-            labelist2[i].grid(column = 6, columnspan = 2, sticky= W)
+        tree = self.treevar.get()
+        if tree == 'None':
+            tree = 'ID3'
+
+        if tree == 'ID3':
+            self.twolist = GUI.DT.eval(self.twolist)
+            labelist2= []
+            for i in range(len(self.twolist)):
+                labelist2+= [Label(self.predictionframe, text = 'Info-'+str(i) +' - '
+                                   + str(self.twolist[i][0]) + '('+self.odlist[0]+')')]
+                labelist2[i].grid(column = 6, columnspan = 2, sticky= W)
+        elif tree == 'SKT':
+            labelist2 = []
+            listA = GUI.DTSK.eval(self.twolist)
+            for i in range(len(listA)):
+                labelist2 += [Label(self.predictionframe, text = str(listA[i])+'('+str(self.odlist[0])+')')]
+                labelist2[i].grid(column = 6, columnspan = 2, sticky = W)
     def add(self, f, s,t):
         '''
         This method add the information to the list that we want to evaluate
@@ -390,7 +418,7 @@ class predictF(GUI):
         if f!= '' and s!= '' and t!= '':
             self.twolist += [[None, f, s, t]]
         if self.twolist != []:
-            print(self.twolist)
+
             self.labelist = []
             for i in range(len(self.twolist)):
                 self.labelist+=[Label(self.inputedframe1, text = 'Info-'+str(i) + ': \n        ' +
@@ -409,7 +437,7 @@ class predictF(GUI):
         this frame contains an entry box for user to input the number of words for analysis
         '''
         nframe = LabelFrame(self.root)
-        nframe.grid(row = 2, column = 0, columnspan = 2, sticky = E+W+S+N)
+        nframe.grid(row = 3, column = 0, columnspan = 2, sticky = E+W+S+N)
         nL = Label(nframe, text = 'Please enter N for PCA')
         vcmd = self.root.register(self.validate)
         self.nE = Entry(nframe, validate="key", validatecommand=(vcmd, '%P'))
@@ -420,7 +448,7 @@ class predictF(GUI):
         this frame let user to select uploaded files to evaluate or train
         '''
         selectframe = LabelFrame(self.root, text = 'Please select files')
-        selectframe.grid(row = 2, column = 2, columnspan = 2, sticky = E+W+S+N)
+        selectframe.grid(row = 3, column = 2, columnspan = 2, sticky = E+W+S+N)
         self.variables = []
         for i in range(len(GUI.fileName)):
             var = IntVar()
@@ -430,9 +458,9 @@ class predictF(GUI):
         '''
         this frame contains the Evaluate and Train button and the status entry at the right
         '''
-        Button(text = 'Train', command = self.pcaTrain).grid(row = 2, column = 5, columnspan = 1, sticky = E+W+S+N)
-        Button(text = 'Evaluation', command = self.pcaEval).grid(row = 3, column = 5, columnspan = 1, sticky = E+W+S+N)
-        Label(text = 'Status\nNothing has been done yet').grid(row = 4, column = 5)
+        Button(text = 'Train', command = self.pcaTrain).grid(row = 3, column = 5, columnspan = 1, sticky = E+W+S+N)
+        Button(text = 'Evaluation', command = self.pcaEval).grid(row = 4, column = 5, columnspan = 1, sticky = E+W+S+N)
+        Label(text = 'Status\nNothing has been done yet').grid(row = 5, column = 5)
     def pcaTrain(self):
         '''
         this function calls SKPCA to train self.pca
@@ -447,7 +475,7 @@ class predictF(GUI):
         self.pca = SKPCA()
         self.pca.train(tlnames, tlobjs, self.n)
         self.forget(4)
-        Label(text = 'Status\nTrained').grid(row = 4, column = 5)
+        Label(text = 'Status\nTrained').grid(row = 5, column = 5)
     def pcaEval(self):
         '''
         this function evaluate the given files
@@ -462,10 +490,10 @@ class predictF(GUI):
                 evobjs.append(GUI.fileObj[i])
         (result, X, Y) = self.pca.evaluation(evnames, evobjs)
         self.forget(4)
-        Label(text = 'Result in order').grid(row = 4, column = 5)
+        Label(text = 'Result in order').grid(row = 5, column = 5)
         index = [GUI.fileName.index(item) for item in result]
         for i in index:
-            Label(text = GUI.charInfo[i][0]).grid(row = 5, column = 5)
+            Label(text = GUI.charInfo[i][0]).grid(row = 6, column = 5)
         MatPlotPloter().scatterPlot(X, Y)
 
 class charInfoF(GUI):
